@@ -2,7 +2,7 @@ import { Fragment } from 'react';
 import Link from 'next/link';
 import useSWR from 'swr';
 import { v4 as uuidv4 } from 'uuid';
-import Episode from '@/components/episode';
+import Episode from '@/components/Episode';
 import { ArrowRightIcon } from '@heroicons/react/24/solid';
 
 export default function Home() {
