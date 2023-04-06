@@ -14,10 +14,7 @@ export default function Home() {
   const { data: resp } = useSWR(url, fetcher);
 
   if (!resp) return;
-
-  // memoize the return array...
-  //...since we're always expecting...
-  //...the latest four episodes
+  
   const { data } = resp;
 
   return (
