@@ -1,4 +1,4 @@
-import { Fragment } from 'react';
+import { Fragment, useMemo } from 'react';
 import Link from 'next/link';
 import useSWR from 'swr';
 import { v4 as uuidv4 } from 'uuid';
@@ -6,7 +6,7 @@ import Episode from '@/components/Episode';
 import { ArrowRightIcon } from '@heroicons/react/24/solid';
 
 export default function Home() {
-  // Fetch audio messages
+  // Fetch audio messages with useSWR on the client side only
   const fetcher = (...args) => fetch(...args).then((res) => res.json());
   const url =
     'http://localhost:1337/api/audio-messages?populate[audio][fields][0]=name&populate[audio][fields][1]=alternativeText&populate[audio][fields][2]=url&populate[audio][fields][3]=provider_metadata';
@@ -15,10 +15,13 @@ export default function Home() {
 
   if (!resp) return;
 
+  // memoize the return array...
+  //...since we're always expecting...
+  //...the latest four episodes
   const { data } = resp;
 
   return (
-    <div className="mt-6 px-5">
+    <div className="grow mt-6 px-5">
       <header className="font-extrabold">
         <h1>
           <span className="font-medium italic">Rekindling</span>
@@ -40,7 +43,7 @@ export default function Home() {
 
         <article className="grid grid-cols-1 gap-3">
           {data
-            .sort((a, b) => a.id - b.id)
+            .sort((a, b) => b.id - a.id)
             .slice(0, 4)
             .map((details) => (
               <Fragment key={uuidv4()}>
