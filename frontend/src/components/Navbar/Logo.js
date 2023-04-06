@@ -9,7 +9,7 @@ const leagueSpartan = League_Spartan({
 
 const Logo = () => {
   return (
-    <Link href="/" className={`${leagueSpartan.className} leading-4.5 cursor-pointer`} aria-label="Logo">
+    <Link href="/" className={`text-umd ${leagueSpartan.className} leading-4.5 cursor-pointer`} aria-label="Logo">
       The Best <br /> of Arome
     </Link>
   );
