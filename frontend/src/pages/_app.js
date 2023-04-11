@@ -13,7 +13,7 @@ const poppins = Poppins({
 export default function App({ Component, pageProps }) {
   return (
     <div
-      className={`min-h-screen flex flex-col ${poppins.variable} font-sans font-normal`}>
+      className={`min-h-screen container mx-auto flex flex-col ${poppins.variable} font-sans font-normal`}>
       <Layout>
         <Component {...pageProps} />
       </Layout>
