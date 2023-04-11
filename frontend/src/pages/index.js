@@ -1,21 +1,13 @@
-import { Fragment, useMemo } from 'react';
+import { Fragment, useMemo, useEffect } from 'react';
 import Link from 'next/link';
-import useSWR from 'swr';
 import { v4 as uuidv4 } from 'uuid';
-import Episode from '@/components/Episode';
+import AudioMessage from '@/components/AudioMessage';
 import { ArrowRightIcon } from '@heroicons/react/24/solid';
 
-export default function Home() {
-  // Fetch audio messages with useSWR on the client side only
-  const fetcher = (...args) => fetch(...args).then((res) => res.json());
-  const url =
-    'http://localhost:1337/api/audio-messages?populate[audio][fields][0]=name&populate[audio][fields][1]=alternativeText&populate[audio][fields][2]=url&populate[audio][fields][3]=provider_metadata';
-
-  const { data: resp } = useSWR(url, fetcher);
-
-  if (!resp) return;
-  
-  const { data } = resp;
+export default function Home({ data }) {
+  const memoizedData = useMemo(() => {
+    return data;
+  }, [data]);
 
   return (
     <div className="grow mt-6 px-5">
@@ -39,16 +31,32 @@ export default function Home() {
         </div>
 
         <article className="grid grid-cols-1 gap-3">
-          {data
+          {memoizedData
             .sort((a, b) => b.id - a.id)
             .slice(0, 4)
             .map((details) => (
               <Fragment key={uuidv4()}>
-                <Episode {...details} />
+                <AudioMessage.Snippet {...details} />
               </Fragment>
             ))}
         </article>
       </main>
     </div>
   );
+}
+
+export async function getServerSideProps(ctx) {
+  // Get up to date  data of new audio messages...
+  // ...from the server
+  const res = await fetch(
+    'http://localhost:1337/api/audio-messages?populate[playlist][fields][0]=slug&populate[audio][fields][0]=alternativeText&populate[audio][fields][1]=url'
+  );
+
+  const { data } = await res.json();
+
+  return {
+    props: {
+      data,
+    },
+  };
 }
