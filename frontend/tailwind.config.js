@@ -7,6 +7,8 @@ module.exports = {
   darkMode: 'media',
   theme: {
     screens: {
+      xs: '375px',
+      md: '640px',
       lg: '834px',
       xl: '1440px',
     },
@@ -122,6 +124,9 @@ module.exports = {
           800: '#0d0d0d',
           900: '#000000',
         },
+      },
+      gap: {
+        15: '3.75rem',
       },
     },
   },
