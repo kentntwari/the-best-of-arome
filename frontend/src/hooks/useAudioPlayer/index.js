@@ -9,15 +9,7 @@ const useAudioPlayer = (source) => {
   // ...in the background without needing to attach...
   // ...an actual HTML element and reference it to avoid...
   // ...multiple re-renders
-  const audioRef = useRef(null);
-  function getAudio() {
-    if (audioRef.current !== null) return audioRef.current;
-
-    const audio = new Audio(source);
-    audioRef.current = audio;
-
-    return audio;
-  }
+  const audioRef = useRef(typeof Audio !== 'undefined' && new Audio(source));
 
   // Default object to be controlled by a reducer
   const defaultAudioState = {
@@ -37,32 +29,33 @@ const useAudioPlayer = (source) => {
   useEventListener(
     EVENTS.CAN_PLAY_THROUGH,
     () => dispatch({ type: ACTIONS.CAN_PLAY }),
-    getAudio()
+    audioRef.current
   );
 
   /* retrieve some useful metadata like duration
   by checking the DOM if any metata was loaded */
   function retrieveAudioDuration() {
-    if (getAudio().duration === NaN) return dispatch({ type: ACTIONS.DURATION_IS_NaN });
+    if (audioRef.current.duration === NaN)
+      return dispatch({ type: ACTIONS.DURATION_IS_NaN });
 
     // format duration to common standards...
     //...of minute and seconds...
     //...and send duration if there is
-    let minutes = Math.floor(getAudio().duration / 60);
+    let minutes = Math.floor(audioRef.current.duration / 60);
     minutes = minutes < 10 ? '0' + minutes : minutes;
-    let seconds = Math.floor(getAudio().duration % 60);
+    let seconds = Math.floor(audioRef.current.duration % 60);
     seconds = seconds < 10 ? '0' + seconds : seconds;
 
-    dispatch({ type: ACTIONS.SET_DURATION, payload: `${minutes}:${seconds}` });
+    return dispatch({ type: ACTIONS.SET_DURATION, payload: `${minutes}:${seconds}` });
   }
 
-  useEventListener(EVENTS.LOADED_METADATA, retrieveAudioDuration, getAudio());
+  useEventListener(EVENTS.LOADED_METADATA, retrieveAudioDuration, audioRef.current);
 
   // // Wrapper around the play functionality
   const playAudio = useCallback(() => {
     if (!state.isPlaying) {
       dispatch({ type: ACTIONS.PLAY_AUDIO });
-      return getAudio().play();
+      return audioRef.current.play();
     }
   }, [state.isPlaying]);
 
@@ -70,7 +63,7 @@ const useAudioPlayer = (source) => {
   const pauseAudio = useCallback(() => {
     if (!state.isPaused) {
       dispatch({ type: ACTIONS.PAUSE_AUDIO });
-      return getAudio().pause();
+      return audioRef.current.pause();
     }
   }, [state.isPaused]);
 
