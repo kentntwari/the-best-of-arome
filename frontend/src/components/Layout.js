@@ -5,7 +5,7 @@ const Layout = ({ children }) => {
   return (
     <>
       <Navbar />
-      {children}
+      <div className="grow">{children}</div>
       <Footer />
     </>
   );
