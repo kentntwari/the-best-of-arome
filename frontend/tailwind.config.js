@@ -128,6 +128,9 @@ module.exports = {
       gap: {
         15: '3.75rem',
       },
+      spacing: {
+        50: '12rem',
+      },
     },
   },
   plugins: [],
