@@ -7,11 +7,6 @@ const Snippet = (props) => {
     attributes: {
       title,
       slug,
-      playlist: {
-        data: {
-          attributes: { slug: playlist },
-        },
-      },
       audio: {
         data: {
           attributes: { alternativeText, url },
@@ -39,10 +34,7 @@ const Snippet = (props) => {
 
       <div className="flex items-center justify-between">
         <Link
-          href={{
-            pathname: `/audio-message/${slug}`,
-            query: { playlist },
-          }}
+          href={`/audio-message/${encodeURIComponent(slug)}`}
           className="bg-la-50 px-3 py-2 rounded text-xs text-ls-500">
           Read details
         </Link>
