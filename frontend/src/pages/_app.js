@@ -1,5 +1,6 @@
-import '../styles/globals.css';
+import { SWRConfig } from 'swr';
 import { Poppins } from 'next/font/google';
+import '../styles/globals.css';
 
 import Layout from '@/components/Layout';
 
@@ -12,11 +13,17 @@ const poppins = Poppins({
 
 export default function App({ Component, pageProps }) {
   return (
-    <div
-      className={`min-h-screen container mx-auto flex flex-col ${poppins.variable} font-sans font-normal`}>
-      <Layout>
-        <Component {...pageProps} />
-      </Layout>
-    </div>
+    <SWRConfig
+      value={{
+        fetcher: (...args) => fetch(...args).then((res) => res.json()),
+        revalidateOnFocus: false,
+      }}>
+      <div
+        className={`min-h-screen container mx-auto flex flex-col ${poppins.variable} font-sans font-normal`}>
+        <Layout>
+          <Component {...pageProps} />
+        </Layout>
+      </div>
+    </SWRConfig>
   );
 }
