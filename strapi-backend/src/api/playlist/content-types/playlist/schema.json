@@ -27,6 +27,11 @@
       "relation": "oneToMany",
       "target": "api::audio-message.audio-message",
       "mappedBy": "playlist"
+    },
+    "slug": {
+      "type": "uid",
+      "targetField": "name",
+      "required": true
     }
   }
 }
