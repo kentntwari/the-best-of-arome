@@ -1,22 +1,35 @@
-import { useRouter } from 'next/router';
+import useNextInQueue from '@/hooks/useNextInQueue';
 import Link from 'next/link';
+import NextInQueue from '@/components/AudioMessage/NextInQueue';
 import { ChevronRightIcon } from '@heroicons/react/24/solid';
 
 const AudioMessage = ({ data }) => {
-  // access the router object to retrieve the playlist...
-  //...passed in the router and pass it in the link
-  const router = useRouter();
-
   // retrieve the data of the fetched audio message...
-  // ...fro the nested response attributes in data
-  const { title, description } = data[0].attributes;
+  // ...fro the nested response attributes in data)
+  const { title, description, slug: audioSlug, playlist } = data[0].attributes;
+
+  // retrieve the playlist slug
+  const {
+    data: {
+      attributes: { slug: playlistSlug },
+    },
+  } = playlist;
+
+  // retrieve next audio from custom hook
+  const { nextAudio } = useNextInQueue(playlistSlug, audioSlug);
+
+  // Format details of next audio in  queue as an object
+  const nextAudio_details = {
+    audio_slug: nextAudio?.attributes?.slug,
+    audio_title: nextAudio?.attributes?.title,
+  };
 
   return (
     <article>
       <main className="px-5 py-4 bg-la-300 flex flex-col gap-[60px]" role="message">
         <div className="flex items-center gap-2 text-black-300">
           <Link
-            href={`/playlist/${encodeURIComponent(router.query.playlist)}`}
+            href={`/playlist/${encodeURIComponent(playlistSlug)}`}
             className="text-xs">
             Go back to playlist
           </Link>
@@ -31,13 +44,20 @@ const AudioMessage = ({ data }) => {
         </div>
       </main>
 
-      <section className="p-5 flex flex-col gap-3" role="details">
+      <section className="p-5 flex flex-col gap-5" role="details and more">
         <div className="flex flex-col gap-3" role="description">
-          <div>
-            <p className="font-semibold text-base">Description</p>
-          </div>
+          <p className="font-semibold text-base">Description</p>
           <p className="text-sm text-justify text-black-300">{description}</p>
         </div>
+
+        {/* <div className="flex items-center gap-4">
+          <span className="font-semibold text-xs text-ls-500">Share this message</span>
+          <div className="flex items-center gap-2">
+
+          </div>
+        </div> */}
+
+        <NextInQueue {...nextAudio_details} />
       </section>
     </article>
   );
@@ -63,7 +83,7 @@ export async function getStaticPaths() {
 export async function getStaticProps({ params }) {
   // get matching data with the slug of the fecthed audio message
   const res = await fetch(
-    `http://localhost:1337/api/audio-messages?filters[slug][$eq]=${params.slug}&populate[audio][fields][0]=alternativeText&populate[audio][fields][1]=url`
+    `http://localhost:1337/api/audio-messages?filters[slug][$eq]=${params.slug}&populate[playlist][fields][0]=slug&populate[audio][fields][0]=alternativeText&populate[audio][fields][1]=url`
   );
   const { data } = await res.json();
 
