@@ -3,10 +3,13 @@ import useSWR from 'swr';
 // Get the next audio in a playlist queue
 const useNextInQueue = (playlist, audioSlug) => {
   // Define url that will be the basis of the requests
-  const url = `http://localhost:1337/api/playlists?filters[slug][$eq]=${playlist}&populate[1]=audio_messages.audio`;
+  // const url = `http://localhost:1337/api/playlists?filters[slug][$eq]=${playlist}&populate[1]=audio_messages.audio`;
+
+  // for testing purposes
+  const test_url = 'https://mocki.io/v1/6cc51a1f-f0e8-4df1-ab0e-e02c67b8381b';
 
   // Retrieve data from strapi
-  const { data, isLoading, error } = useSWR(url, getAsyncAudioFromPlaylist);
+  const { data, isLoading, error } = useSWR(test_url, getAsyncAudioFromPlaylist);
 
   // Asynchronously get the audio in the playlist...
   async function getAsyncAudioFromPlaylist() {
@@ -49,4 +52,4 @@ const useNextInQueue = (playlist, audioSlug) => {
   };
 };
 
-export default useNextInQueue;
+export { useNextInQueue };
