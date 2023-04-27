@@ -1,4 +1,4 @@
-import { Fragment, useMemo } from 'react';
+import { Fragment } from 'react';
 import useSWR from 'swr';
 import Link from 'next/link';
 import Head from 'next/head';
@@ -10,10 +10,13 @@ export default function Home() {
   /* fetch data on the client with swr...*/
   // construct url to be fetched for audio messages...
   // ...from strapi CMS with only the needed fields
-  const url =
-    'http://localhost:1337/api/audio-messages?populate[playlist][fields][0]=slug&populate[audio][fields][0]=alternativeText&populate[audio][fields][1]=url';
+  // const url =
+  //   'http://localhost:1337/api/audio-messages?populate[playlist][fields][0]=slug&populate[audio][fields][0]=alternativeText&populate[audio][fields][1]=url';
 
-  const { data: latestMessages } = useSWR(url);
+  // for testing purposes
+  const test_url = 'https://mocki.io/v1/82e531c2-4786-4c6c-b557-51d8e85e0823';
+
+  const { data: latestMessages } = useSWR(test_url);
 
   if (!latestMessages) return;
 
@@ -57,7 +60,7 @@ export default function Home() {
           </div>
 
           <article className="grid grid-cols-1 gap-3">
-            {data
+            {[...data]
               .sort((a, b) => b.id - a.id)
               .slice(0, 4)
               .map((details) => (
