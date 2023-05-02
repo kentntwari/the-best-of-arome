@@ -1,10 +1,18 @@
-import { useNextInQueue } from '@/hooks/useNextInQueue';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
+
+import { useNextInQueue } from '@/hooks/useNextInQueue';
+
 import AudioPlayer from '@/components/AudioPlayer';
 import AudioMessage from '@/components/AudioMessage';
+import AudioPlaylist from '@/components/AudioPlaylist';
+
 import { ChevronRightIcon } from '@heroicons/react/24/solid';
 
 const AudioMessagePage = ({ data }) => {
+  // access url link to derive UI state from query
+  const router = useRouter();
+
   // retrieve the data of the fetched audio message...
   // ...fro the nested response attributes in data)
   const { title, description, slug: audioSlug, playlist, audio } = data[0].attributes;
@@ -27,20 +35,23 @@ const AudioMessagePage = ({ data }) => {
   const { nextAudio } = useNextInQueue(playlistSlug, audioSlug);
 
   // Format details of next audio in  queue as an object
-  const nextAudio_details = {
+  const nextAudio_props = {
     audio_slug: nextAudio?.attributes?.slug,
     audio_title: nextAudio?.attributes?.title,
   };
 
   return (
-    <article>
+    <article className="relative">
+      {router.query.playlist && <AudioPlaylist />}
+      
       <main className="px-5 py-4 bg-la-300 flex flex-col gap-[60px]" role="message">
         <div className="flex items-center gap-2 text-black-300">
           <Link
-            href={`/playlist/${encodeURIComponent(playlistSlug)}`}
+            href={`/audio-message/${audioSlug}/?playlist=${playlistSlug}`}
             className="text-xs">
             Go back to playlist
           </Link>
+
           <ChevronRightIcon className="w-4" />
         </div>
 
@@ -51,6 +62,7 @@ const AudioMessagePage = ({ data }) => {
           <h3 className="font-bold text-black-300">{title}</h3>
         </div>
       </main>
+
       <AudioPlayer playing={url} />
 
       <section className="p-5 flex flex-col gap-5" role="details and more">
@@ -59,7 +71,7 @@ const AudioMessagePage = ({ data }) => {
           <p className="text-sm text-justify text-black-300">{description}</p>
         </div>
 
-        <AudioMessage.NextInQueue {...nextAudio_details} />
+        <AudioMessage.NextInQueue {...nextAudio_props} />
       </section>
     </article>
   );
