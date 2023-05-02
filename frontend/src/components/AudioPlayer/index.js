@@ -9,46 +9,67 @@ import {
 
 import { convertToMinutesSeconds } from './utils/convertToMinutesSeconds';
 
+const Back = memo(BackwardIcon);
+const Play = memo(PlayCircleIcon);
+const Pause = memo(PauseCircleIcon);
+const Forward = memo(ForwardIcon);
+
 const AudioPlayer = ({ type = null, playing: url }) => {
   // define audio states needed for custom audio player
   const [audioIsPlaying, setAudioIsPlaying] = useState(false);
-  const [audioCurrentTime, setAudioCurrentTime] = useState(null);
   const [audioDuration, setAudioDuration] = useState(null);
 
   // reference DOM elements and values in memoruy
   const audioPlayer_ref = useRef();
+  const duration_ref = useRef();
+  const currentTime_ref = useRef();
   const progressBar_ref = useRef();
-  const audioCurrentTime_ref = useRef(null);
-  const audioDuration_ref = useRef(null);
 
   // instantiate future values
-  audioCurrentTime_ref.current = audioCurrentTime;
-  audioDuration_ref.current = audioDuration;
+  // audioCurrentTime_ref.current = audioCurrentTime;
+  duration_ref.current = audioPlayer_ref.current?.duration;
 
   // retrieve audio duration on start up(mount)
   useEffect(() => {
     setAudioDuration(audioPlayer_ref.current?.duration);
   }, [audioPlayer_ref.current?.duration]);
 
+  // update everything that depends on the current progress...
+  // ...of the audio, from current time to range track styling
+  let animate = false;
+
+  let update = () => {
+    currentTime_ref.current.innerText =
+      convertToMinutesSeconds(audioPlayer_ref.current?.currentTime) ?? '--:--';
+
+    progressBar_ref.current.value =
+      (audioPlayer_ref.current?.currentTime / duration_ref.current) * 100;
+
+    progressBar_ref.current.style.background = `linear-gradient(to right,#ae7137 0 ${progressBar_ref.current.value}%,#dedede 0)`;
+
+    if (animate === true) {
+      requestAnimationFrame(update);
+    }
+  };
+
   // save play audio function
   const playAudio = useCallback(() => {
+    if (animate === false) {
+      animate = true;
+      window.requestAnimationFrame(update);
+    }
+
     return audioPlayer_ref.current.play();
   }, []);
 
   // save pause audio function
   const pauseAudio = useCallback(() => {
+    if (animate === true) {
+      animate = false;
+      window.cancelAnimationFrame(update);
+    }
+
     return audioPlayer_ref.current.pause();
-  }, []);
-
-  // update everything that depends on the current progress...
-  // ...of the audio, from current time to range track styling
-  const updateAudioProgress = useCallback(() => {
-    setAudioCurrentTime(audioPlayer_ref.current?.currentTime);
-
-    progressBar_ref.current.value =
-      (audioCurrentTime_ref.current / audioDuration_ref.current) * 100;
-
-    progressBar_ref.current.style.background = `linear-gradient(to right,#ae7137 0 ${progressBar_ref.current.value}%,#dedede 0)`;
   }, []);
 
   // render component when only play button and total duration is needed
@@ -63,7 +84,7 @@ const AudioPlayer = ({ type = null, playing: url }) => {
           onPlay={() => setAudioIsPlaying(true)}
           onPause={() => setAudioIsPlaying(false)}
         />
-        <span>{convertToMinutesSeconds(audioDuration_ref.current) ?? '--:--'}</span>
+        <span>{convertToMinutesSeconds(duration_ref.current) ?? '--:--'}</span>
 
         {audioIsPlaying ? (
           <PauseCircleIcon
@@ -79,7 +100,7 @@ const AudioPlayer = ({ type = null, playing: url }) => {
       </div>
     );
 
-    // full fledged-audio player component
+  // full fledged-audio player component
   return (
     <div className="bg-la-100 p-5 flex flex-col gap-5">
       <audio
@@ -87,14 +108,13 @@ const AudioPlayer = ({ type = null, playing: url }) => {
         src={url}
         preload="metadata"
         onLoadedMetadata={() => setAudioDuration(audioPlayer_ref.current.duration)}
-        onTimeUpdate={updateAudioProgress}
         onPlay={() => setAudioIsPlaying(true)}
         onPause={() => setAudioIsPlaying(false)}
       />
 
       <div className="grid grid-cols-[35px_1fr_35px] items-center gap-1">
-        <span className="text-xs">
-          {convertToMinutesSeconds(audioCurrentTime_ref.current)}
+        <span ref={currentTime_ref} className="text-xs">
+          00:00
         </span>
         <input
           ref={progressBar_ref}
@@ -106,29 +126,23 @@ const AudioPlayer = ({ type = null, playing: url }) => {
           className="grow h-2 appearance-none bg-neutral-40 rounded-full"
         />
         <span className="text-xs">
-          {convertToMinutesSeconds(audioDuration_ref.current) ?? '--:--'}
+          {convertToMinutesSeconds(audioDuration) ?? '--:--'}
         </span>
       </div>
 
       <div className="flex items-center justify-center gap-4">
-        <BackwardIcon className="w-7.5 text-ls-300" />
+        <Back className="w-7.5 text-ls-300" />
 
         {audioIsPlaying ? (
-          <PauseCircleIcon
-            onClick={pauseAudio}
-            className="w-10 text-ls-300 cursor-pointer"
-          />
+          <Pause onClick={pauseAudio} className="w-10 text-ls-300 cursor-pointer" />
         ) : (
-          <PlayCircleIcon
-            onClick={playAudio}
-            className="w-10 text-ls-400 cursor-pointer"
-          />
+          <Play onClick={playAudio} className="w-10 text-ls-400 cursor-pointer" />
         )}
 
-        <ForwardIcon className="w-7.5 text-ls-300" />
+        <Forward className="w-7.5 text-ls-300" />
       </div>
     </div>
   );
 };
 
-export default memo(AudioPlayer);
+export default AudioPlayer;
