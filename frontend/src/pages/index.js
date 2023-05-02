@@ -1,8 +1,11 @@
 import { Fragment } from 'react';
-import useSWR from 'swr';
+
 import Link from 'next/link';
 import Head from 'next/head';
+
+import useSWR from 'swr';
 import { v4 as uuidv4 } from 'uuid';
+
 import AudioMessage from '@/components/AudioMessage';
 import { ArrowRightIcon } from '@heroicons/react/24/solid';
 
