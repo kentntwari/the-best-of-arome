@@ -1,6 +1,8 @@
 import { Poppins } from 'next/font/google';
 import '../styles/globals.css';
+
 import { SWRConfig } from 'swr';
+
 import Layout from '@/components/Layout';
 
 const poppins = Poppins({
