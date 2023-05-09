@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 
+import useEventListener from '@use-it/event-listener';
+
 import { convertToMinutesSeconds as formatTime } from '@/hooks/useAudioPlayer/utils/convertToMinutesSeconds';
 
 const useAudioPlayer = (player) => {
@@ -35,11 +37,13 @@ const useAudioPlayer = (player) => {
   let animate = false;
 
   let update = () => {
-    currentTime_ref.current.innerText = formatTime(player?.currentTime);
+    if (currentTime_ref.current)
+      currentTime_ref.current.innerText = formatTime(player?.currentTime);
 
-    progressBar_ref.current.value = (player?.currentTime / duration_ref.current) * 100;
-
-    progressBar_ref.current.style.background = `linear-gradient(to right,#ae7137 0 ${progressBar_ref.current.value}%,#dedede 0)`;
+    if (progressBar_ref.current) {
+      progressBar_ref.current.value = (player?.currentTime / duration_ref.current) * 100;
+      progressBar_ref.current.style.background = `linear-gradient(to right,#ae7137 0 ${progressBar_ref.current.value}%,#dedede 0)`;
+    }
 
     if (animate === true) {
       requestAnimationFrame(update);
