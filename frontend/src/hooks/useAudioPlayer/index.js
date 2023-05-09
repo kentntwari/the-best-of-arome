@@ -1,77 +1,136 @@
-import { useReducer, useCallback, useRef, useEffect } from 'react';
-import { useEventListener } from '../useEventListener';
-import { reducer } from './reducer';
-import { ACTIONS } from './actions';
-import { EVENTS } from './events';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 
-const useAudioPlayer = (source) => {
-  // create a new audio instance to control audio...
-  // ...in the background without needing to attach...
-  // ...an actual HTML element and reference it to avoid...
-  // ...multiple re-renders
-  const audioRef = useRef(typeof Audio !== 'undefined' && new Audio(source));
+import { convertToMinutesSeconds as formatTime } from '@/hooks/useAudioPlayer/utils/convertToMinutesSeconds';
 
-  // Default object to be controlled by a reducer
-  const defaultAudioState = {
-    isReadyToPlay: false,
-    isPlaying: false,
-    isPaused: true,
-    duration: null,
+const useAudioPlayer = (player) => {
+  // Barebones state that need to be rendered or re-rendered
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [duration, setDuration] = useState(null);
+
+  // render duration on mount
+  useEffect(() => {
+    setDuration(player?.duration);
+  }, [player?.duration]);
+
+  // render initial value of current audio time
+  useEffect(() => {
+    if (currentTime_ref.current) currentTime_ref.current.innerText = '00:00';
+  }, []);
+
+  // reference the duration as it doesn't change...
+  // ...per audio file that is playing
+  const duration_ref = useRef();
+  duration_ref.current = duration;
+
+  // reference the current time from a HTML element...
+  // ...as th eupdated value will be directly inserted...
+  // ...in the DOM
+  const currentTime_ref = useRef();
+
+  // reference the progress bar html element
+  const progressBar_ref = useRef();
+
+  // calculate expended audio time with animation frame...
+  // ...to avoid needless re-rendering
+  let animate = false;
+
+  let update = () => {
+    currentTime_ref.current.innerText = formatTime(player?.currentTime);
+
+    progressBar_ref.current.value = (player?.currentTime / duration_ref.current) * 100;
+
+    progressBar_ref.current.style.background = `linear-gradient(to right,#ae7137 0 ${progressBar_ref.current.value}%,#dedede 0)`;
+
+    if (animate === true) {
+      requestAnimationFrame(update);
+    }
   };
 
-  // initalizing reducer
-  const [state, dispatch] = useReducer(reducer, defaultAudioState);
-
-  // check if enough data is available to play
-  // with the `canplaythrough`audio event...
-  // ...we`ll determine if the full length...
-  // ...of the audio is even available to play
-  useEventListener(
-    EVENTS.CAN_PLAY_THROUGH,
-    () => dispatch({ type: ACTIONS.CAN_PLAY }),
-    audioRef.current
+  // Exported JSX element for current time
+  const CurrentTime = useMemo(
+    () =>
+      ({ className = 'text-xs', children }) => {
+        return (
+          <span className={className} ref={currentTime_ref}>
+            {children}
+          </span>
+        );
+      },
+    []
   );
 
-  /* retrieve some useful metadata like duration
-  by checking the DOM if any metata was loaded */
-  function retrieveAudioDuration() {
-    if (audioRef.current.duration === NaN)
-      return dispatch({ type: ACTIONS.DURATION_IS_NaN });
+  // Exported JSX element for duration
+  const Duration = useMemo(
+    () =>
+      ({ className = 'text-xs' }) => {
+        return (
+          <span className={className}>{formatTime(duration_ref.current) ?? '--:--'}</span>
+        );
+      },
+    []
+  );
 
-    // format duration to common standards...
-    //...of minute and seconds...
-    //...and send duration if there is
-    let minutes = Math.floor(audioRef.current.duration / 60);
-    minutes = minutes < 10 ? '0' + minutes : minutes;
-    let seconds = Math.floor(audioRef.current.duration % 60);
-    seconds = seconds < 10 ? '0' + seconds : seconds;
+  // Exported JSX element for range input type element
+  const ProgressBar = useMemo(
+    () => () =>
+      (
+        <input
+          ref={progressBar_ref}
+          type="range"
+          step={0.5}
+          defaultValue={0}
+          min={0}
+          max={100}
+          className="grow h-2 appearance-none bg-neutral-40 rounded-full"
+        />
+      ),
+    []
+  );
 
-    return dispatch({ type: ACTIONS.SET_DURATION, payload: `${minutes}:${seconds}` });
-  }
+  // set audio state to isPlaying...
+  const readAudioIsPlaying = useCallback(() => {
+    return setIsPlaying(true);
+  }, []);
 
-  useEventListener(EVENTS.LOADED_METADATA, retrieveAudioDuration, audioRef.current);
+  // set audio state to pause...
+  const readAudioIsPaused = useCallback(() => {
+    return setIsPlaying(false);
+  }, []);
 
-  // // Wrapper around the play functionality
-  const playAudio = useCallback(() => {
-    if (!state.isPlaying) {
-      dispatch({ type: ACTIONS.PLAY_AUDIO });
-      return audioRef.current.play();
-    }
-  }, [state.isPlaying]);
+  // save play audio function
+  const playAudio = () => {
+    animate = true;
+    window.requestAnimationFrame(update);
 
-  // // Wrapper around pause functionality
-  const pauseAudio = useCallback(() => {
-    if (!state.isPaused) {
-      dispatch({ type: ACTIONS.PAUSE_AUDIO });
-      return audioRef.current.pause();
-    }
-  }, [state.isPaused]);
+    return player?.play();
+  };
+
+  // save pause audio function
+  const pauseAudio = () => {
+    animate = false;
+    window.cancelAnimationFrame(update);
+
+    return player?.pause();
+  };
 
   return {
-    readOutput: state,
-    actions: {
+    exportedComponents: {
+      CurrentTime,
+      Duration,
+      ProgressBar,
+    },
+    state: {
+      audioIsPlaying: isPlaying,
+    },
+    methods: {
       playAudio,
       pauseAudio,
+      updateAnimationFrame: update,
+      updateAudioState: {
+        isPlaying: readAudioIsPlaying,
+        isPaused: readAudioIsPaused,
+      },
+      updateDuration: (newDuration) => setDuration(newDuration),
     },
   };
 };
