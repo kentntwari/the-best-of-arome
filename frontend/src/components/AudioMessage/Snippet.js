@@ -1,6 +1,7 @@
 import Link from 'next/link';
 
 import AudioPlayer from '../AudioPlayer';
+import AudioPlayerProvider from '../AudioPlayer/Provider';
 
 const Snippet = (props) => {
   const {
@@ -27,8 +28,10 @@ const Snippet = (props) => {
           className="bg-la-50 px-3 py-2 rounded text-xs text-ls-500">
           Read details
         </Link>
-
-        <AudioPlayer playing={url} type="playonly" />
+        
+        <AudioPlayerProvider value={url}>
+          <AudioPlayer type="playonly" />
+        </AudioPlayerProvider>
       </div>
     </div>
   );
