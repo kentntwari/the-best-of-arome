@@ -6,6 +6,7 @@ import { useNextInQueue } from '@/hooks/useNextInQueue';
 import AudioPlayer from '@/components/AudioPlayer';
 import AudioMessage from '@/components/AudioMessage';
 import AudioPlaylist from '@/components/AudioPlaylist';
+import AudioPlayerProvider from '@/components/AudioPlayer/Provider';
 
 import { ChevronRightIcon } from '@heroicons/react/24/solid';
 
@@ -43,7 +44,7 @@ const AudioMessagePage = ({ data }) => {
   return (
     <article className="relative">
       {router.query.playlist && <AudioPlaylist />}
-      
+
       <main className="px-5 py-4 bg-la-300 flex flex-col gap-[60px]" role="message">
         <div className="flex items-center gap-2 text-black-300">
           <Link
@@ -63,7 +64,9 @@ const AudioMessagePage = ({ data }) => {
         </div>
       </main>
 
-      <AudioPlayer playing={url} />
+      <AudioPlayerProvider value={url}>
+        <AudioPlayer />
+      </AudioPlayerProvider>
 
       <section className="p-5 flex flex-col gap-5" role="details and more">
         <div className="flex flex-col gap-3" role="description">
