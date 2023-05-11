@@ -99,12 +99,17 @@ const useAudioPlayer = (url) => {
     return audio_ref.current?.pause();
   }, []);
 
+  // method for direct slider time change...
+  // ...this will immediately impact the current time...
+  // ... and appearance of the progress bar background
   const seekTimeframe = useCallback((e) => {
     audio_ref.current.currentTime = (duration_ref.current * e.target.value) / 100;
     displayAudioCurrentTime();
     fillProgressBarBackground();
   }, []);
 
+  // method to jump forward 0.5s of the current time...
+  // ...will freeze when it reached audio duration
   const forwardAudio = useCallback(() => {
     if (audio_ref.current?.currentTime < duration_ref.current) {
       audio_ref.current.currentTime += 0.5;
@@ -113,6 +118,8 @@ const useAudioPlayer = (url) => {
     }
   }, [audio_ref.current?.currentTime]);
 
+  // method to jump backwards 0.5s of the current time...
+  // ...will freeze when it reached audio duration
   const backwardAudio = useCallback(() => {
     if (audio_ref.current?.currentTime >= 0) {
       audio_ref.current.currentTime -= 0.5;
