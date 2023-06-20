@@ -2,46 +2,20 @@ import { Fragment } from 'react';
 
 import Link from 'next/link';
 
-import { AdjustmentsHorizontalIcon } from '@heroicons/react/24/solid';
 import { v4 as uuidv4 } from 'uuid';
+import { AdjustmentsHorizontalIcon } from '@heroicons/react/24/solid';
 
-// some test data
-const test_data = [
-  {
-    title: 'How to speak with the Holy Ghost',
-    duration: '10:06',
-  },
-  {
-    title: 'How to speak with the Holy Ghost',
-    duration: '10:06',
-  },
-  {
-    title: 'How to speak with the Holy Ghost',
-    duration: '10:06',
-  },
-  {
-    title: 'How to speak with the Holy Ghost',
-    duration: '10:06',
-  },
-  {
-    title: 'How to speak with the Holy Ghost',
-    duration: '10:06',
-  },
-  {
-    title: 'How to speak with the Holy Ghost',
-    duration: '10:06',
-  },
-  {
-    title: 'How to speak with the Holy Ghost',
-    duration: '10:06',
-  },
-];
+import { useExtractFields } from '@/hooks/useExtractFields';
+import AudioMessage from '../AudioMessage';
 
 const AudioPlaylist = () => {
+  const { playlist } = useExtractFields('playlist');
+
+  if (!playlist) return;
+
   return (
-    <Fragment>
-      <div className="absolute w-full h-full top-0 left-0 z-10 bg-lp-300"></div>
-      <section className="w-full h-screen px-5 py-4 absolute top-0 left-0 z-20">
+    <>
+      <section className="px-5 py-4">
         <Link
           href="/browse"
           className="underline underline-offset-3 text-sm text-neutral-200 decoration-neutral-200">
@@ -75,22 +49,18 @@ const AudioPlaylist = () => {
           </div>
 
           <div>
-            {test_data.map((item, index) => (
-              <div
-                key={uuidv4()}
-                className={`px-2 py-4 ${
-                  index % 2 ? 'bg-la-50' : 'bg-la-75'
-                } flex items-center`}>
-                <p className="grow font-semibold text-xs text-ls-400">{item.title}</p>
-                <span className="w-16 h-6 rounded bg-ls-300 flex items-center justify-center text-white-300">
-                  {item.duration}
-                </span>
-              </div>
+            {playlist.map((details, index) => (
+              <Fragment key={uuidv4()}>
+                <AudioMessage.Piece
+                  data={details}
+                  trackBg={index % 2 ? 'bg-la-50' : 'bg-la-75'}
+                />
+              </Fragment>
             ))}
           </div>
         </div>
       </section>
-    </Fragment>
+    </>
   );
 };
 
