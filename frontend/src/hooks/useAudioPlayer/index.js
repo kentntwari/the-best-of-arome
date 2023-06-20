@@ -1,60 +1,62 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 
-import useEventListener from '@use-it/event-listener';
+import {
+  PlayCircleIcon,
+  PauseCircleIcon,
+  BackwardIcon,
+  ForwardIcon,
+} from '@heroicons/react/24/solid';
 
-import { EVENTS } from './utils/audioEvents';
+import { usePlayerContext } from '../usePlayerContext';
+import { useSWRAudioState } from '../useSWRAudioState';
+
 import { convertToMinutesSeconds as formatTime } from './utils/convertToMinutesSeconds';
 
-const useAudioPlayer = (url) => {
-  // Barebones state that need to be rendered or re-rendered
-  const [isReadyToPlay, setIsReadyToPlay] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [duration, setDuration] = useState(null);
+const useAudioPlayer = (title, slug, url = '') => {
+  const context = usePlayerContext();
+  let player = context.audio_ref.current;
 
-  // instantiate reference for dynamic audio element
-  const audio_ref = useRef();
+  const [, setPlayerDetails] = useSWRAudioState();
 
-  // reference the duration as it doesn't change...
-  // ...per audio file that is playing
-  const duration_ref = useRef();
-  duration_ref.current = duration;
+  const timeoutRef = useRef();
 
   // reference the current time from a HTML element...
-  // ...as the updated value will be directly inserted...
-  // ...in the DOM
+  // ...as the updated value will be directly inserted in the DOM
   const currentTime_ref = useRef();
 
   // reference the progress bar html element
   const progressBar_ref = useRef();
 
+  const [duration, setDuration] = useState(null);
+  const duration_ref = useRef();
+  duration_ref.current = duration;
+
   useEffect(() => {
-    if (!url) {
-      setIsReadyToPlay(false);
-      console.error('No url was given as an argument for useAudioPlayer hook');
+    let mounted = true;
+
+    if (mounted && player) {
+      setTimeout(() => setDuration(player?.duration), 50);
     }
 
-    setIsReadyToPlay(true);
+    if (mounted && !player) {
+      player = new Audio(url);
+      player.preload = 'metadata';
+    }
 
-    audio_ref.current = new Audio();
-    audio_ref.current.preload = 'metadata';
-    audio_ref.current.src = url;
-  }, [url]);
+    return () => {
+      mounted = false;
+    };
+  }, [player]);
 
   // render initial value of current audio time
   useEffect(() => {
     if (currentTime_ref.current) currentTime_ref.current.innerText = '00:00';
-  }, []);
 
-  const displayAudioCurrentTime = useCallback(() => {
-    if (currentTime_ref.current)
-      currentTime_ref.current.innerText =
-        formatTime(audio_ref.current?.currentTime) ?? '00:00';
-  }, []);
+    const init = timeoutRef.current;
 
-  const fillProgressBarBackground = useCallback(() => {
-    progressBar_ref.current.value =
-      (audio_ref.current?.currentTime / duration_ref.current) * 100;
-    progressBar_ref.current.style.background = `linear-gradient(to right,#ae7137 0 ${progressBar_ref.current.value}%,#dedede 0)`;
+    return () => {
+      clearTimeout(init);
+    };
   }, []);
 
   // calculate expended audio time with animation frame...
@@ -73,14 +75,16 @@ const useAudioPlayer = (url) => {
     }
   }, []);
 
-  // set audio state to isPlaying...
-  const readAudioIsPlaying = useCallback(() => {
-    return setIsPlaying(true);
+  const displayAudioCurrentTime = useCallback(() => {
+    if (currentTime_ref.current)
+      currentTime_ref.current.innerText = formatTime(player?.currentTime) ?? '00:00';
   }, []);
 
-  // set audio state to pause...
-  const readAudioIsPaused = useCallback(() => {
-    return setIsPlaying(false);
+  const fillProgressBarBackground = useCallback(() => {
+    if (progressBar_ref.current) {
+      progressBar_ref.current.value = (player?.currentTime / player?.duration) * 100;
+      progressBar_ref.current.style.background = `linear-gradient(to right,#ae7137 0 ${progressBar_ref.current.value}%,#dedede 0)`;
+    }
   }, []);
 
   // save play audio function
@@ -88,22 +92,25 @@ const useAudioPlayer = (url) => {
     animate = true;
     window.requestAnimationFrame(update);
 
-    return audio_ref.current?.play();
+    setPlayerDetails({ title, slug, url, isAudioPlaying: true });
+
+    const t = setTimeout(() => player?.play(), 100);
+    timeoutRef.current = t;
   }, []);
 
   // save pause audio function
   const pauseAudio = useCallback(() => {
-    animate = false;
-    window.cancelAnimationFrame(update);
+    setPlayerDetails({ isAudioPlaying: false });
 
-    return audio_ref.current?.pause();
+    const t = setTimeout(() => player?.pause(), 100);
+    timeoutRef.current = t;
   }, []);
 
   // method for direct slider time change...
   // ...this will immediately impact the current time...
   // ... and appearance of the progress bar background
   const seekTimeframe = useCallback((e) => {
-    audio_ref.current.currentTime = (duration_ref.current * e.target.value) / 100;
+    player.currentTime = (player?.duration * e.target.value) / 100;
     displayAudioCurrentTime();
     fillProgressBarBackground();
   }, []);
@@ -111,58 +118,73 @@ const useAudioPlayer = (url) => {
   // method to jump forward 0.5s of the current time...
   // ...will freeze when it reached audio duration
   const forwardAudio = useCallback(() => {
-    if (audio_ref.current?.currentTime < duration_ref.current) {
-      audio_ref.current.currentTime += 0.5;
-      displayAudioCurrentTime();
-      fillProgressBarBackground();
+    if (player?.currentTime < player?.duration) {
+      player.currentTime += 0.5;
     }
-  }, [audio_ref.current?.currentTime]);
+  }, [player?.currentTime]);
 
   // method to jump backwards 0.5s of the current time...
   // ...will freeze when it reached audio duration
   const backwardAudio = useCallback(() => {
-    if (audio_ref.current?.currentTime >= 0) {
-      audio_ref.current.currentTime -= 0.5;
-      displayAudioCurrentTime();
-      fillProgressBarBackground();
+    if (player?.currentTime >= 0) {
+      player.currentTime -= 0.5;
     }
-  }, [audio_ref.current?.currentTime]);
+  }, [player?.currentTime]);
 
-  // audio event listener to calculate how many...
-  // ...frames are available to be played
-  useEventListener(
-    EVENTS.LOADED,
-    () => {
-      if (audio_ref.current.readyState === 0) {
-        setIsReadyToPlay(false);
-        console.warn('no enough frame loaded to play file');
-      }
-
-      setIsReadyToPlay(true);
-    },
-    audio_ref.current
+  /* EXPORTED COMPONENTS */
+  const Play = useMemo(
+    () =>
+      ({ variant = '' }) =>
+        (
+          <PlayCircleIcon
+            onClick={playAudio}
+            className={`w-10 text-ls-400 ${variant} cursor-pointer`}
+          />
+        ),
+    []
   );
 
-  // audio event listener that sends duration...
-  // ..as soon as enough metdata is available
-  useEventListener(
-    EVENTS.LOADED_METADATA,
-    () => setDuration(audio_ref.current?.duration),
-    audio_ref.current
+  const Pause = useMemo(
+    () =>
+      ({ variant = '' }) =>
+        (
+          <PauseCircleIcon
+            onClick={pauseAudio}
+            className={`w-10 text-ls-300 ${variant} cursor-pointer`}
+          />
+        ),
+    []
   );
 
-  // audio event listener that listens if the audio is playing
-  useEventListener(EVENTS.PLAY_AUDIO, readAudioIsPlaying, audio_ref.current);
+  const Back = useMemo(
+    () =>
+      ({ variant = '' }) =>
+        (
+          <BackwardIcon
+            onClick={backwardAudio}
+            className={`w-7.5 text-ls-300 ${variant} cursor-pointer`}
+          />
+        ),
+    []
+  );
 
-  // audio event listener that listens if audio is paused
-  useEventListener(EVENTS.PAUSE_AUDIO, readAudioIsPaused, audio_ref.current);
+  const Forward = useMemo(
+    () =>
+      ({ variant = '' }) =>
+        (
+          <ForwardIcon
+            onClick={forwardAudio}
+            className={`w-7.5 text-ls-300 ${variant} cursor-pointer`}
+          />
+        ),
+    []
+  );
 
-  // Exported JSX element for current time
   const CurrentTime = useMemo(
     () =>
-      ({ className = 'text-xs', children }) => {
+      ({ variant = '', children }) => {
         return (
-          <span className={className} ref={currentTime_ref}>
+          <span className={`text-xs ${variant}`} ref={currentTime_ref}>
             {children}
           </span>
         );
@@ -170,18 +192,20 @@ const useAudioPlayer = (url) => {
     []
   );
 
-  // Exported JSX element for duration
   const Duration = useMemo(
     () =>
-      ({ className = 'text-xs' }) => {
+      ({ variant = '', forceValue = null }) => {
+        if (forceValue) return <span className={`text-xs ${variant}`}>{forceValue}</span>;
+
         return (
-          <span className={className}>{formatTime(duration_ref.current) ?? '--:--'}</span>
+          <span className={`text-xs ${variant}`}>
+            {formatTime(duration_ref.current) ?? '--:--'}
+          </span>
         );
       },
     []
   );
 
-  // Exported JSX element for range input type element
   const ProgressBar = useMemo(
     () => () =>
       (
@@ -200,28 +224,21 @@ const useAudioPlayer = (url) => {
   );
 
   return {
-    exportedComponents: {
-      CurrentTime,
-      Duration,
-      ProgressBar,
-    },
-    state: {
-      ready: isReadyToPlay,
-      audioIsPlaying: isPlaying,
-    },
+    player,
     methods: {
       playAudio,
       pauseAudio,
-      updateAnimationFrame: update,
-      updateAudioState: {
-        isPlaying: readAudioIsPlaying,
-        isPaused: readAudioIsPaused,
-      },
-      updateCurrentTime: {
-        forwardAudio,
-        backwardAudio,
-      },
-      updateDuration: (newDuration) => setDuration(newDuration),
+      forwardAudio,
+      backwardAudio,
+    },
+    Components: {
+      Play,
+      Pause,
+      Back,
+      Forward,
+      CurrentTime,
+      Duration,
+      ProgressBar,
     },
   };
 };
