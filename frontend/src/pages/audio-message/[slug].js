@@ -1,18 +1,20 @@
+import { useEffect, useState } from 'react';
+
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 
-import { useNextInQueue } from '@/hooks/useNextInQueue';
+import { useSWRAudioState } from '@/hooks/useSWRAudioState';
 
 import AudioPlayer from '@/components/AudioPlayer';
-import AudioMessage from '@/components/AudioMessage';
 import AudioPlaylist from '@/components/AudioPlaylist';
-import AudioPlayerProvider from '@/components/AudioPlayer/Provider';
 
 import { ChevronRightIcon } from '@heroicons/react/24/solid';
 
 const AudioMessagePage = ({ data }) => {
   // access url link to derive UI state from query
   const router = useRouter();
+
+  const [, setPlayerDetails] = useSWRAudioState();
 
   // retrieve the data of the fetched audio message...
   // ...fro the nested response attributes in data)
@@ -32,51 +34,54 @@ const AudioMessagePage = ({ data }) => {
     },
   } = audio;
 
-  // retrieve next audio from custom hook
-  const { nextAudio } = useNextInQueue(playlistSlug, audioSlug);
+  useEffect(() => {
+    let mounted = true;
 
-  // Format details of next audio in  queue as an object
-  const nextAudio_props = {
-    audio_slug: nextAudio?.attributes?.slug,
-    audio_title: nextAudio?.attributes?.title,
-  };
+    if (mounted) {
+      setPlayerDetails({ title, slug: audioSlug, url });
+    }
+
+    return () => {
+      mounted = false;
+    };
+  }, [title, audioSlug, url]);
 
   return (
-    <article className="relative">
-      {router.query.playlist && <AudioPlaylist />}
+    <>
+      {router.query.playlist ? (
+        <AudioPlaylist />
+      ) : (
+        <article>
+          <main className="px-5 py-4 bg-la-300 flex flex-col gap-[60px]" role="message">
+            <div className="flex items-center gap-2 text-black-300">
+              <Link
+                href={`/audio-message/${audioSlug}/?playlist=${playlistSlug}`}
+                className="text-xs">
+                Go back to playlist
+              </Link>
 
-      <main className="px-5 py-4 bg-la-300 flex flex-col gap-[60px]" role="message">
-        <div className="flex items-center gap-2 text-black-300">
-          <Link
-            href={`/audio-message/${audioSlug}/?playlist=${playlistSlug}`}
-            className="text-xs">
-            Go back to playlist
-          </Link>
+              <ChevronRightIcon className="w-4" />
+            </div>
 
-          <ChevronRightIcon className="w-4" />
-        </div>
+            <div className="flex flex-col gap-3">
+              <span className="w-fit px-3 py-2 rounded-full bg-white-300 text-xs text-black-300">
+                Audio post
+              </span>
+              <h3 className="font-bold text-black-300">{title}</h3>
+            </div>
+          </main>
 
-        <div className="flex flex-col gap-3">
-          <span className="w-fit px-3 py-2 rounded-full bg-white-300 text-xs text-black-300">
-            Audio post
-          </span>
-          <h3 className="font-bold text-black-300">{title}</h3>
-        </div>
-      </main>
+          <AudioPlayer {...{ title, slug: audioSlug, url }} />
 
-      <AudioPlayerProvider value={url}>
-        <AudioPlayer />
-      </AudioPlayerProvider>
-
-      <section className="p-5 flex flex-col gap-5" role="details and more">
-        <div className="flex flex-col gap-3" role="description">
-          <p className="font-semibold text-base">Description</p>
-          <p className="text-sm text-justify text-black-300">{description}</p>
-        </div>
-
-        <AudioMessage.NextInQueue {...nextAudio_props} />
-      </section>
-    </article>
+          <section className="p-5 flex flex-col gap-5" role="details and more">
+            <div className="flex flex-col gap-3" role="description">
+              <p className="font-semibold text-base">Description</p>
+              <p className="text-sm text-justify text-black-300">{description}</p>
+            </div>
+          </section>
+        </article>
+      )}
+    </>
   );
 };
 
@@ -102,7 +107,7 @@ export async function getStaticPaths() {
   };
 }
 
-export async function getStaticProps({ params }) {
+export async function getStaticProps(ctx) {
   // get matching data with the slug of the fecthed audio message
   // const res = await fetch(
   //   `http://localhost:1337/api/audio-messages?filters[slug][$eq]=${params.slug}&populate[playlist][fields][0]=slug&populate[audio][fields][0]=alternativeText&populate[audio][fields][1]=url`

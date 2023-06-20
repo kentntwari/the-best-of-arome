@@ -1,16 +1,10 @@
-import { Poppins } from 'next/font/google';
 import '../styles/globals.css';
+import { poppins } from '@/styles/fonts';
 
 import { SWRConfig } from 'swr';
 
 import Layout from '@/components/Layout';
-
-const poppins = Poppins({
-  weight: ['400', '500', '600', '700', '800'],
-  style: ['normal', 'italic'],
-  variable: '--font-poppins',
-  preload: false,
-});
+import { PlayerProvider } from '@/context/PlayerContext';
 
 export default function App({ Component, pageProps }) {
   return (
@@ -20,10 +14,12 @@ export default function App({ Component, pageProps }) {
         revalidateOnFocus: false,
       }}>
       <div
-        className={`min-h-screen container mx-auto flex flex-col ${poppins.variable} font-sans font-normal`}>
-        <Layout>
-          <Component {...pageProps} />
-        </Layout>
+        className={`min-h-screen mx-auto flex flex-col ${poppins.variable} font-sans font-normal`}>
+        <PlayerProvider>
+          <Layout>
+            <Component {...pageProps} />
+          </Layout>
+        </PlayerProvider>
       </div>
     </SWRConfig>
   );
