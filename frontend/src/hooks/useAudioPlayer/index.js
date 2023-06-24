@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { useEffect, useRef, useCallback, useMemo } from 'react';
 
 import {
   PlayCircleIcon,
@@ -10,43 +10,52 @@ import {
 import { usePlayerContext } from '../usePlayerContext';
 import { useSWRAudioState } from '../useSWRAudioState';
 
+import { EVENTS } from './utils/audioEvents';
 import { convertToMinutesSeconds as formatTime } from './utils/convertToMinutesSeconds';
 
-const useAudioPlayer = (title, slug, url = '') => {
+const useAudioPlayer = (title = '', slug = '', url = '') => {
   const context = usePlayerContext();
-  let player = context.audio_ref.current;
+  let player = context.ref.current;
 
   const [, setPlayerDetails] = useSWRAudioState();
 
   const timeoutRef = useRef();
-
   // reference the current time from a HTML element...
   // ...as the updated value will be directly inserted in the DOM
   const currentTime_ref = useRef();
-
   // reference the progress bar html element
   const progressBar_ref = useRef();
-
-  const [duration, setDuration] = useState(null);
   const duration_ref = useRef();
-  duration_ref.current = duration;
 
   useEffect(() => {
     let mounted = true;
 
     if (mounted && player) {
-      setTimeout(() => setDuration(player?.duration), 50);
+      setTimeout(
+        () =>
+          duration_ref.current?.innerText &&
+          (duration_ref.current.innerText = formatTime(player?.duration)),
+        50
+      );
     }
 
     if (mounted && !player) {
       player = new Audio(url);
       player.preload = 'metadata';
+      player.addEventListener(EVENTS.PLAY_AUDIO, () => context.forceAudioPlay(true));
+      player.addEventListener(EVENTS.PAUSE_AUDIO, () => context.forceAudioPlay(false));
     }
 
     return () => {
       mounted = false;
+      player.removeEventListener(EVENTS.PLAY_AUDIO, () => context.forceAudioPlay(true));
+      player.removeEventListener(EVENTS.PAUSE_AUDIO, () => context.forceAudioPlay(false));
     };
   }, [player]);
+
+  // calculate expended audio time with animation frame...
+  // ...to avoid needless re-rendering
+  let animate = false;
 
   // render initial value of current audio time
   useEffect(() => {
@@ -58,10 +67,6 @@ const useAudioPlayer = (title, slug, url = '') => {
       clearTimeout(init);
     };
   }, []);
-
-  // calculate expended audio time with animation frame...
-  // ...to avoid needless re-rendering
-  let animate = false;
 
   let update = useCallback(() => {
     displayAudioCurrentTime();
@@ -92,18 +97,17 @@ const useAudioPlayer = (title, slug, url = '') => {
     animate = true;
     window.requestAnimationFrame(update);
 
-    setPlayerDetails({ title, slug, url, isAudioPlaying: true });
+    setPlayerDetails({ title, slug, url });
 
-    const t = setTimeout(() => player?.play(), 100);
-    timeoutRef.current = t;
+    setTimeout(() => player?.play(), 50);
   }, []);
 
   // save pause audio function
   const pauseAudio = useCallback(() => {
-    setPlayerDetails({ isAudioPlaying: false });
+    animate = false;
+    window.cancelAnimationFrame(update);
 
-    const t = setTimeout(() => player?.pause(), 100);
-    timeoutRef.current = t;
+    setTimeout(() => player?.pause(), 50);
   }, []);
 
   // method for direct slider time change...
@@ -120,6 +124,8 @@ const useAudioPlayer = (title, slug, url = '') => {
   const forwardAudio = useCallback(() => {
     if (player?.currentTime < player?.duration) {
       player.currentTime += 0.5;
+      displayAudioCurrentTime();
+      fillProgressBarBackground();
     }
   }, [player?.currentTime]);
 
@@ -128,6 +134,8 @@ const useAudioPlayer = (title, slug, url = '') => {
   const backwardAudio = useCallback(() => {
     if (player?.currentTime >= 0) {
       player.currentTime -= 0.5;
+      displayAudioCurrentTime();
+      fillProgressBarBackground();
     }
   }, [player?.currentTime]);
 
@@ -198,7 +206,7 @@ const useAudioPlayer = (title, slug, url = '') => {
         if (forceValue) return <span className={`text-xs ${variant}`}>{forceValue}</span>;
 
         return (
-          <span className={`text-xs ${variant}`}>
+          <span ref={duration_ref} className={`text-xs ${variant}`}>
             {formatTime(duration_ref.current) ?? '--:--'}
           </span>
         );

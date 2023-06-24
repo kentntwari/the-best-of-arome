@@ -1,9 +1,8 @@
-import { useEffect } from 'react';
 import useSWR from 'swr';
 
 const useSWRAudioState = (
   key = 'queried',
-  initialData = { title: '', slug: '', url: '', isAudioPlaying: false }
+  initialData = { title: '', slug: '', url: '' }
 ) => {
   const { data, mutate } = useSWR(key, () => initialData);
 
@@ -16,7 +15,6 @@ const useSWRAudioState = (
           title: playerDetails.title,
           slug: playerDetails.slug,
           url: playerDetails.url,
-          isAudioPlaying: playerDetails.isAudioPlaying,
         },
         { revalidate: false }
       ),
