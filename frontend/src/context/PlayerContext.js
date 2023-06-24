@@ -1,4 +1,6 @@
-import { createContext, useEffect, useState, useRef } from 'react';
+import { createContext, useState, useEffect, useRef } from 'react';
+
+import { useRouter } from 'next/router';
 
 import { useSWRAudioState } from '@/hooks/useSWRAudioState';
 
@@ -6,6 +8,9 @@ const PlayerContext = createContext(null);
 
 const PlayerProvider = ({ children }) => {
   const [url, setUrl] = useState(null);
+  const [isAudioPlaying, setIsAudioPlaying] = useState(false);
+
+  const router = useRouter();
 
   const audio_ref = useRef();
   const [playerDetails] = useSWRAudioState();
@@ -17,10 +22,19 @@ const PlayerProvider = ({ children }) => {
   }, [playerDetails.url]);
 
   return (
-    <PlayerContext.Provider value={{ audio_ref }}>
-      <audio ref={audio_ref} src={url} preload="metadata" />
-      {children}
-    </PlayerContext.Provider>
+    <>
+      <audio
+        ref={audio_ref}
+        src={url}
+        preload="metadata"
+        onPlay={() => setIsAudioPlaying(true)}
+        onPause={() => setIsAudioPlaying(false)}
+      />
+      <PlayerContext.Provider
+        value={{ ref: audio_ref, isAudioPlaying, forceAudioPlay: setIsAudioPlaying }}>
+        {children}
+      </PlayerContext.Provider>
+    </>
   );
 };
 
