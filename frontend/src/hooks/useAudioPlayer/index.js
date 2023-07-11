@@ -11,13 +11,14 @@ import { usePlayerContext } from '../usePlayerContext';
 import { useSWRAudioState } from '../useSWRAudioState';
 
 import { EVENTS } from './utils/audioEvents';
+import * as defaultClasses from './utils/defaultClasses';
 import { convertToMinutesSeconds as formatTime } from './utils/convertToMinutesSeconds';
 
-const useAudioPlayer = (title = '', slug = '', url = '') => {
+const useAudioPlayer = () => {
   const context = usePlayerContext();
   let player = context.ref.current;
 
-  const [, setPlayerDetails] = useSWRAudioState();
+  const [playerDetails, setPlayerDetails] = useSWRAudioState();
 
   const timeoutRef = useRef();
   // reference the current time from a HTML element...
@@ -40,7 +41,8 @@ const useAudioPlayer = (title = '', slug = '', url = '') => {
     }
 
     if (mounted && !player) {
-      player = new Audio(url);
+      player = new Audio(playerDetails.url);
+
       player.preload = 'metadata';
       player.addEventListener(EVENTS.PLAY_AUDIO, () => context.forceAudioPlay(true));
       player.addEventListener(EVENTS.PAUSE_AUDIO, () => context.forceAudioPlay(false));
@@ -85,10 +87,12 @@ const useAudioPlayer = (title = '', slug = '', url = '') => {
       currentTime_ref.current.innerText = formatTime(player?.currentTime) ?? '00:00';
   }, []);
 
-  const fillProgressBarBackground = useCallback(() => {
+  const fillProgressBarBackground = useCallback((overrideBgColor = '') => {
     if (progressBar_ref.current) {
       progressBar_ref.current.value = (player?.currentTime / player?.duration) * 100;
-      progressBar_ref.current.style.background = `linear-gradient(to right,#ae7137 0 ${progressBar_ref.current.value}%,#dedede 0)`;
+      progressBar_ref.current.style.background = `linear-gradient(to right,${
+        overrideBgColor === '' ? '#ae7137' : overrideBgColor
+      } 0 ${progressBar_ref.current.value}%,#dedede 0)`;
     }
   }, []);
 
@@ -97,7 +101,7 @@ const useAudioPlayer = (title = '', slug = '', url = '') => {
     animate = true;
     window.requestAnimationFrame(update);
 
-    setPlayerDetails({ title, slug, url });
+    context.forceAudioPlay(true);
 
     setTimeout(() => player?.play(), 50);
   }, []);
@@ -106,6 +110,8 @@ const useAudioPlayer = (title = '', slug = '', url = '') => {
   const pauseAudio = useCallback(() => {
     animate = false;
     window.cancelAnimationFrame(update);
+
+    context.forceAudioPlay(false);
 
     setTimeout(() => player?.pause(), 50);
   }, []);
@@ -146,7 +152,7 @@ const useAudioPlayer = (title = '', slug = '', url = '') => {
         (
           <PlayCircleIcon
             onClick={playAudio}
-            className={`w-10 text-ls-400 ${variant} cursor-pointer`}
+            className={`${defaultClasses.playButtonClass} ${variant}`}
           />
         ),
     []
@@ -158,7 +164,7 @@ const useAudioPlayer = (title = '', slug = '', url = '') => {
         (
           <PauseCircleIcon
             onClick={pauseAudio}
-            className={`w-10 text-ls-300 ${variant} cursor-pointer`}
+            className={`${defaultClasses.pauseButtonClass} ${variant}`}
           />
         ),
     []
@@ -170,7 +176,7 @@ const useAudioPlayer = (title = '', slug = '', url = '') => {
         (
           <BackwardIcon
             onClick={backwardAudio}
-            className={`w-7.5 text-ls-300 ${variant} cursor-pointer`}
+            className={`${defaultClasses.backButtonClass} ${variant}`}
           />
         ),
     []
@@ -182,7 +188,7 @@ const useAudioPlayer = (title = '', slug = '', url = '') => {
         (
           <ForwardIcon
             onClick={forwardAudio}
-            className={`w-7.5 text-ls-300 ${variant} cursor-pointer`}
+            className={`${defaultClasses.forwardButtonClass} ${variant}`}
           />
         ),
     []
@@ -225,7 +231,7 @@ const useAudioPlayer = (title = '', slug = '', url = '') => {
           defaultValue={0}
           min={0}
           max={100}
-          className="grow h-2 appearance-none bg-neutral-40 rounded-full"
+          className={`${defaultClasses.progressBarClass}`}
         />
       ),
     []
