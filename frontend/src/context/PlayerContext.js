@@ -1,7 +1,5 @@
 import { createContext, useState, useEffect, useRef } from 'react';
 
-import { useRouter } from 'next/router';
-
 import { useSWRAudioState } from '@/hooks/useSWRAudioState';
 
 const PlayerContext = createContext(null);
@@ -9,8 +7,6 @@ const PlayerContext = createContext(null);
 const PlayerProvider = ({ children }) => {
   const [url, setUrl] = useState(null);
   const [isAudioPlaying, setIsAudioPlaying] = useState(false);
-
-  const router = useRouter();
 
   const audio_ref = useRef();
   const [playerDetails] = useSWRAudioState();
