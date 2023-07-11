@@ -4,9 +4,11 @@ import { poppins } from '@/styles/fonts';
 import { SWRConfig } from 'swr';
 
 import Layout from '@/components/Layout';
+
 import { PlayerProvider } from '@/context/PlayerContext';
 
 export default function App({ Component, pageProps }) {
+
   return (
     <SWRConfig
       value={{

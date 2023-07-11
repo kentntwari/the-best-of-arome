@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -71,7 +71,7 @@ const AudioMessagePage = ({ data }) => {
             </div>
           </main>
 
-          <AudioPlayer {...{ title, slug: audioSlug, url }} />
+          <AudioPlayer />
 
           <section className="p-5 flex flex-col gap-5" role="details and more">
             <div className="flex flex-col gap-3" role="description">
