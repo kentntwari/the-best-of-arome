@@ -1,9 +1,18 @@
+import { useState, useEffect, useCallback } from 'react';
+
 import { usePlayerContext } from '@/hooks/usePlayerContext';
 import { useAudioPlayer } from '@/hooks/useAudioPlayer';
 
 const AudioPlayer = (props) => {
-  const { Components } = useAudioPlayer(props.title, props.slug, props.url);
+  const { Components } = useAudioPlayer();
+
   const context = usePlayerContext();
+
+  const [audioIsPlaying, setAudioIsPlaying] = useState(false);
+
+  useEffect(() => {
+    setAudioIsPlaying(false);
+  }, []);
 
   return (
     <>
@@ -16,7 +25,9 @@ const AudioPlayer = (props) => {
 
         <div className="flex items-center justify-center gap-4">
           <Components.Back />
+
           {context.isAudioPlaying === true ? <Components.Pause /> : <Components.Play />}
+
           <Components.Forward />
         </div>
       </div>
