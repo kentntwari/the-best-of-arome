@@ -1,4 +1,4 @@
-import { Fragment } from 'react';
+import { Fragment, useRef } from 'react';
 
 import Link from 'next/link';
 
@@ -6,15 +6,24 @@ import { v4 as uuidv4 } from 'uuid';
 import { AdjustmentsHorizontalIcon } from '@heroicons/react/24/solid';
 
 import { useExtractFields } from '@/hooks/useExtractFields';
+import { useSWRAudioState } from '@/hooks/useSWRAudioState';
+
 import AudioMessage from '../AudioMessage';
+import AudioModal from '../AudioModal';
 
 const AudioPlaylist = () => {
   const { playlist } = useExtractFields('playlist');
+
+  const modal_ref = useRef();
+
+  const [, setPlayerDetails] = useSWRAudioState();
 
   if (!playlist) return;
 
   return (
     <>
+      <AudioModal ref={modal_ref} />
+
       <section className="px-5 py-4">
         <Link
           href="/browse"
@@ -50,12 +59,21 @@ const AudioPlaylist = () => {
 
           <div>
             {playlist.map((details, index) => (
-              <Fragment key={uuidv4()}>
+              <div
+                key={uuidv4()}
+                onClick={() => {
+                  setPlayerDetails({
+                    title: details.title,
+                    slug: details.slug,
+                    url: details.url,
+                  });
+                  modal_ref.current.showModal();
+                }}>
                 <AudioMessage.Piece
                   data={details}
                   trackBg={index % 2 ? 'bg-la-50' : 'bg-la-75'}
                 />
-              </Fragment>
+              </div>
             ))}
           </div>
         </div>
