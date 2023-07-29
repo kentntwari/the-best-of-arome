@@ -25,7 +25,7 @@ const AudioPlaylist = () => {
       url: details.url,
     });
     modal_ref.current.showModal();
-    document.body.setAttribute('style', 'hidden');
+    document.body.setAttribute('style', 'overflow: hidden');
   }, []);
 
   if (!playlist) return;
