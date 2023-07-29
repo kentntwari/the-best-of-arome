@@ -2,16 +2,14 @@ import { useState, useRef } from 'react';
 
 import Link from 'next/link';
 
-import { useAudioPlayer } from '@/hooks/useAudioPlayer';
+import { convertToMinutesSeconds as formatTime } from '../../../utils/convertToMinutesSeconds';
 
-import { convertToMinutesSeconds as formatTime } from '@/hooks/useAudioPlayer/utils/convertToMinutesSeconds';
-
+import AudioPlayer from '@/components/AudioPlayer';
+import Duration from '@/components/AudioPlayer/Duration';
 import ForceSwitchPlayPause from '@/components/AudioPlayer/ForceSwitchPlayPause';
 
 const Snippet = (props) => {
   const { title, slug, alternativeText, url } = props;
-
-  const { Components } = useAudioPlayer();
 
   // read duration from audio url provided
   const [localAudioDuration, setLocalAudioDuration] = useState(null);
@@ -38,14 +36,16 @@ const Snippet = (props) => {
             Read details
           </Link>
 
-          <div className="flex items-center gap-2">
-            <Components.Duration forceValue={formatTime(localAudioDuration)} />
-            <ForceSwitchPlayPause
-              watchPlayedTitle={title}
-              watchPlayedSlug={slug}
-              watchPlayedURL={url}
-            />
-          </div>
+          <AudioPlayer enableDefaultFileReadings={false} enableCustomization={true}>
+            <div className="flex items-center gap-2">
+              <Duration forceValue={formatTime(localAudioDuration)} />
+              <ForceSwitchPlayPause
+                watchPlayedTitle={title}
+                watchPlayedSlug={slug}
+                watchPlayedURL={url}
+              />
+            </div>
+          </AudioPlayer>
         </div>
       </div>
     </>
