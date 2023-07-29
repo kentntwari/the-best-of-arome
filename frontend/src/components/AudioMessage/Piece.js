@@ -1,6 +1,6 @@
 import { useRef } from 'react';
 
-import { convertToMinutesSeconds as formatTime } from '@/hooks/useAudioPlayer/utils/convertToMinutesSeconds';
+import { convertToMinutesSeconds as formatTime } from '../../utils/convertToMinutesSeconds';
 
 const Piece = ({ data, trackBg }) => {
   // reference audio for each piece
