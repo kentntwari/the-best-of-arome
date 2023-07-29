@@ -1,4 +1,4 @@
-import { Fragment, useRef } from 'react';
+import { Fragment, useRef, useCallback } from 'react';
 
 import Link from 'next/link';
 
@@ -17,6 +17,16 @@ const AudioPlaylist = () => {
   const modal_ref = useRef();
 
   const [, setPlayerDetails] = useSWRAudioState();
+
+  const sendGlobalPlayerDetails = useCallback((details) => {
+    setPlayerDetails({
+      title: details.title,
+      slug: details.slug,
+      url: details.url,
+    });
+    modal_ref.current.showModal();
+    document.body.setAttribute('style', 'hidden');
+  }, []);
 
   if (!playlist) return;
 
@@ -59,16 +69,7 @@ const AudioPlaylist = () => {
 
           <div>
             {playlist.map((details, index) => (
-              <div
-                key={uuidv4()}
-                onClick={() => {
-                  setPlayerDetails({
-                    title: details.title,
-                    slug: details.slug,
-                    url: details.url,
-                  });
-                  modal_ref.current.showModal();
-                }}>
+              <div key={uuidv4()} onClick={() => sendGlobalPlayerDetails(details)}>
                 <AudioMessage.Piece
                   data={details}
                   trackBg={index % 2 ? 'bg-la-50' : 'bg-la-75'}
