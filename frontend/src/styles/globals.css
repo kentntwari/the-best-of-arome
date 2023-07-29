@@ -49,4 +49,8 @@
     width: 20px;
     border-radius: 100%;
   }
+
+  dialog::backdrop {
+    background-color: rgba(106, 69, 34, 0.5);
+  }
 }

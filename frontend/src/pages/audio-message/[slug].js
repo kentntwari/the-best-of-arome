@@ -71,7 +71,9 @@ const AudioMessagePage = ({ data }) => {
             </div>
           </main>
 
-          <AudioPlayer />
+          <div className="bg-la-100 p-5">
+            <AudioPlayer />
+          </div>
 
           <section className="p-5 flex flex-col gap-5" role="details and more">
             <div className="flex flex-col gap-3" role="description">
