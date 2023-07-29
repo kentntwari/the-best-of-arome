@@ -1,35 +1,52 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useEffect } from 'react';
 
-import { usePlayerContext } from '@/hooks/usePlayerContext';
 import { useAudioPlayer } from '@/hooks/useAudioPlayer';
+import { usePlayerContext } from '@/hooks/usePlayerContext';
 
-const AudioPlayer = (props) => {
-  const { Components } = useAudioPlayer();
+import Play from './Play';
+import Pause from './Pause';
+import Back from './Back';
+import Forward from './Forward';
+import Duration from './Duration';
+import CurrentTime from './CurrentTime';
+import ProgressBar from './ProgressBar';
 
+const AudioPlayer = ({
+  enableDefaultFileReadings = true,
+  enableDefaultControls = true,
+  enableCustomization = false,
+  children,
+}) => {
+  const { methods } = useAudioPlayer();
   const context = usePlayerContext();
 
-  const [audioIsPlaying, setAudioIsPlaying] = useState(false);
-
   useEffect(() => {
-    setAudioIsPlaying(false);
+    methods.pauseAudio();
   }, []);
+
+  if (enableCustomization === true) {
+    enableDefaultControls = false;
+
+    return <>{children}</>;
+  }
 
   return (
     <>
-      <div className="bg-la-100 p-5 flex flex-col gap-5">
-        <div className="grid grid-cols-[35px_1fr_35px] items-center gap-1">
-          <Components.CurrentTime />
-          <Components.ProgressBar />
-          <Components.Duration />
-        </div>
-
-        <div className="flex items-center justify-center gap-4">
-          <Components.Back />
-
-          {context.isAudioPlaying === true ? <Components.Pause /> : <Components.Play />}
-
-          <Components.Forward />
-        </div>
+      <div className="flex flex-col gap-5">
+        {enableDefaultFileReadings && (
+          <div className="grid grid-cols-[35px_1fr_35px] items-center gap-1">
+            <CurrentTime>00:00</CurrentTime>
+            <ProgressBar />
+            <Duration />
+          </div>
+        )}
+        {enableDefaultControls && (
+          <div className="flex items-center justify-center gap-4">
+            <Back />
+            {context.globalAudioState.isPlaying === true ? <Pause /> : <Play />}
+            <Forward />
+          </div>
+        )}
       </div>
     </>
   );

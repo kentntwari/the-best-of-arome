@@ -1,15 +1,15 @@
-import { memo, useCallback } from 'react';
+import { useCallback } from 'react';
 
 import { useAudioPlayer } from '@/hooks/useAudioPlayer';
 import { usePlayerContext } from '@/hooks/usePlayerContext';
 import { useSWRAudioState } from '@/hooks/useSWRAudioState';
 
-import * as defaultClasses from '@/hooks/useAudioPlayer/utils/defaultClasses';
+import Play from './Play';
+import Pause from './Pause';
 
-import { PlayCircleIcon, PauseCircleIcon } from '@heroicons/react/24/solid';
-
-const Play = memo(PlayCircleIcon);
-const Pause = memo(PauseCircleIcon);
+/* IMPORTANT DISCLAIMER */
+/* This components is best to be used for lists where you'd want to play an audio file 
+from a list and avoid conflicts between audio files  */
 
 const ForceSwitchPlayPause = ({ watchPlayedTitle, watchPlayedSlug, watchPlayedURL }) => {
   const context = usePlayerContext();
@@ -28,22 +28,16 @@ const ForceSwitchPlayPause = ({ watchPlayedTitle, watchPlayedSlug, watchPlayedUR
     return methods.playAudio();
   }, []);
 
-  if (playerDetails.url === watchPlayedURL && context.isAudioPlaying === true)
-    return (
-      <Pause
-        className={`${defaultClasses.pauseButtonClass}`}
-        onClick={methods.pauseAudio}
-      />
-    );
+  if (playerDetails.url === watchPlayedURL && context.globalAudioState.isPlaying === true)
+    return <Pause />;
 
-  if (playerDetails.url === watchPlayedURL && context.isAudioPlaying === false)
-    return (
-      <Play className={`${defaultClasses.playButtonClass}`} onClick={triggerPlayEvent} />
-    );
+  if (
+    playerDetails.url === watchPlayedURL &&
+    context.globalAudioState.isPlaying === false
+  )
+    return <Play overridePlayEvent={triggerPlayEvent} />;
 
-  return (
-    <Play className={`${defaultClasses.playButtonClass}`} onClick={triggerPlayEvent} />
-  );
+  return <Play overridePlayEvent={triggerPlayEvent} />;
 };
 
 export default ForceSwitchPlayPause;
