@@ -1,11 +1,12 @@
-import { createContext, useState, useEffect, useRef } from 'react';
+import { createContext, useState, useEffect, useRef } from "react";
 
-import { useSWRAudioState } from '@/hooks/useSWRAudioState';
+import { useSWRAudioState } from "@/hooks/useSWRAudioState";
 
 const PlayerContext = createContext(null);
 
 const PlayerProvider = ({ children }) => {
   const [url, setUrl] = useState(null);
+  const [title, setTitle] = useState(null);
   const [globalAudioDuration, setGlobalAudioDuration] = useState(null);
   const [isGlobalAudioPlaying, setIsGlobalAudioPlaying] = useState(false);
 
@@ -13,8 +14,9 @@ const PlayerProvider = ({ children }) => {
   const [playerDetails] = useSWRAudioState();
 
   useEffect(() => {
-    if (playerDetails.url !== '') {
+    if (playerDetails.url !== "") {
       setUrl(playerDetails.url);
+      setTitle(playerDetails.title);
     }
   }, [playerDetails.url]);
 
@@ -24,6 +26,7 @@ const PlayerProvider = ({ children }) => {
         ref={audio_ref}
         src={url}
         preload="metadata"
+        title={title}
         onLoadedMetadata={() => setGlobalAudioDuration(audio_ref.current.duration)}
         onPlay={() => setIsGlobalAudioPlaying(true)}
         onPause={() => setIsGlobalAudioPlaying(false)}
@@ -32,6 +35,7 @@ const PlayerProvider = ({ children }) => {
         value={{
           ref: audio_ref.current,
           globalAudioState: {
+            title,
             isPlaying: isGlobalAudioPlaying,
             duration: globalAudioDuration,
           },
