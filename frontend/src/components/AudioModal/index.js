@@ -1,22 +1,17 @@
-import { forwardRef } from 'react';
+import { forwardRef } from "react";
 
-import { useSWRAudioState } from '@/hooks/useSWRAudioState';
-import { useAudioPlayer } from '@/hooks/useAudioPlayer';
+import { useSWRAudioState } from "@/hooks/useSWRAudioState";
+import { useModal } from "@/hooks/useModal";
 
-import { XCircleIcon, ArrowTopRightOnSquareIcon } from '@heroicons/react/24/solid';
+import { XCircleIcon, ArrowTopRightOnSquareIcon } from "@heroicons/react/24/solid";
 
-import AudioPlayer from '../AudioPlayer';
-import AudioWavesAnimation from './AudioWavesAnimation';
+import AudioPlayer from "../AudioPlayer";
+import AudioWavesAnimation from "./AudioWavesAnimation";
 
 const AudioModal = forwardRef((props, ref) => {
-  const { methods } = useAudioPlayer();
   const [playerDetails] = useSWRAudioState();
 
-  function closeModal() {
-    methods.pauseAudio();
-    ref.current.close();
-    document.body.removeAttribute('style');
-  }
+  const { closeModal } = useModal(ref);
 
   return (
     <dialog ref={ref} className="w-[335px] p-0 border-none rounded-lg appearance-none">
