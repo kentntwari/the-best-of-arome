@@ -1,6 +1,7 @@
 import { useRef } from 'react';
 
 import { convertToMinutesSeconds as formatTime } from '../../utils/convertToMinutesSeconds';
+import { truncateText } from '@/utils/truncateText';
 
 const Piece = ({ data, trackBg }) => {
   // reference audio for each piece
@@ -22,7 +23,9 @@ const Piece = ({ data, trackBg }) => {
       />
 
       <div className={`px-2 py-4 ${trackBg} flex items-center`}>
-        <p className="grow font-semibold text-xs text-ls-400">{data.title}</p>
+        <p className="grow font-semibold text-xs text-ls-400">
+          {truncateText(data.title, 31)}
+        </p>
 
         <span
           ref={duration_ref}
