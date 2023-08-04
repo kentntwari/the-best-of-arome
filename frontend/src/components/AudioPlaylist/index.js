@@ -1,38 +1,37 @@
-import { Fragment, useRef, useCallback } from 'react';
+import { useRef } from "react";
 
-import Link from 'next/link';
+import Link from "next/link";
+import { useRouter } from "next/router";
 
-import { v4 as uuidv4 } from 'uuid';
-import { AdjustmentsHorizontalIcon } from '@heroicons/react/24/solid';
+import { v4 as uuidv4 } from "uuid";
+import { AdjustmentsHorizontalIcon } from "@heroicons/react/24/solid";
 
-import { useExtractFields } from '@/hooks/useExtractFields';
-import { useSWRAudioState } from '@/hooks/useSWRAudioState';
+import { useModal } from "@/hooks/useModal";
+import { useAudioPlayer } from "@/hooks/useAudioPlayer";
+import { useExtractFields } from "@/hooks/useExtractFields";
+import { useSWRAudioState } from "@/hooks/useSWRAudioState";
 
-import AudioMessage from '../AudioMessage';
-import AudioModal from '../AudioModal';
+import AudioMessage from "../AudioMessage";
+import AudioModal from "../AudioModal";
 
 const AudioPlaylist = () => {
-  const { playlist } = useExtractFields('playlist');
+  const audioModal_ref = useRef();
 
-  const modal_ref = useRef();
+  const router = useRouter();
+
+  const { methods } = useAudioPlayer();
+
+  const { playlist } = useExtractFields({ playlist: router.query.playlist });
 
   const [, setPlayerDetails] = useSWRAudioState();
 
-  const sendGlobalPlayerDetails = useCallback((details) => {
-    setPlayerDetails({
-      title: details.title,
-      slug: details.slug,
-      url: details.url,
-    });
-    modal_ref.current.showModal();
-    document.body.setAttribute('style', 'overflow: hidden');
-  }, []);
+  const { openModal } = useModal(audioModal_ref);
 
   if (!playlist) return;
 
   return (
     <>
-      <AudioModal ref={modal_ref} />
+      <AudioModal ref={audioModal_ref} />
 
       <section className="px-5 py-4">
         <Link
@@ -48,12 +47,10 @@ const AudioPlaylist = () => {
             <h3
               className="capitalize font-semibold text-black-300"
               aria-label="playlist title">
-              the holy spirit
+              {playlist.name}
             </h3>
             <p className="mt-2 text-xs text-black-300" aria-label="playlist description">
-              tortor id aliquet lectus proin nibh nisl condimentum id venenatis a
-              condimentum vitae sapien pellentesque habitant morbi tristique senectus et
-              netus et malesuada
+              {playlist.description}
             </p>
           </div>
         </article>
@@ -68,11 +65,23 @@ const AudioPlaylist = () => {
           </div>
 
           <div>
-            {playlist.map((details, index) => (
-              <div key={uuidv4()} onClick={() => sendGlobalPlayerDetails(details)}>
+            {playlist.audios.map((details, index) => (
+              <div
+                key={uuidv4()}
+                onClick={() => {
+                  methods.pauseAudio();
+
+                  setPlayerDetails({
+                    title: details.title,
+                    slug: details.slug,
+                    url: details.url,
+                  });
+
+                  openModal();
+                }}>
                 <AudioMessage.Piece
                   data={details}
-                  trackBg={index % 2 ? 'bg-la-50' : 'bg-la-75'}
+                  trackBg={index % 2 ? "bg-la-50" : "bg-la-75"}
                 />
               </div>
             ))}
