@@ -1,65 +1,39 @@
-import useSWR from 'swr';
+import useSWR from "swr";
 
 const useExtractFields = (fieldType) => {
+  /* General endpoints for pool of elements not too deeply nested */
   switch (fieldType) {
-    case 'playlist': {
-      /* fetch data on the client with swr...*/
-      // construct url to be fetched fron audio...
-      // ...from strapi audio-messages endpoint
-      // const url =
-      //   'http://localhost:1337/api/audio-messages?filters[playlist][slug][$eq]=prayer&populate[audio][fields][1]=url';
+    case "playlists": {
+      const url = "http://localhost:1337/api/playlists";
 
-      // test-api
-      const test_url = 'https://mocki.io/v1/9a099a38-3b65-4f9b-b7c9-974860923488';
+      const { data: arr } = useSWR(url);
 
-      const { data: playlist } = useSWR(test_url);
-
-      if (!playlist) {
+      if (!arr) {
         return {
-          playlist: undefined,
+          playlists: undefined,
         };
       }
 
-      const { data } = playlist;
+      const { data } = arr;
 
-      const mappedData = [...data].map(
-        ({
-          attributes: {
-            title,
-            description,
-            slug,
-            audio: {
-              data: {
-                attributes: { url },
-              },
-            },
-          },
-        }) => {
-          return {
-            title,
-            description,
-            slug,
-            url,
-          };
-        }
-      );
+      const playlists = [...data].map(({ attributes }) => {
+        return {
+          name: attributes.name,
+          description: attributes.description,
+          slug: attributes.slug,
+        };
+      });
 
       return {
-        playlist: mappedData,
+        playlists,
       };
     }
 
-    case 'snippets': {
-      /* fetch data on the client with swr...*/
-      // construct url to be fetched for audio messages...
-      // ...from strapi CMS with only the needed fields
-      // const url =
-      //   'http://localhost:1337/api/audio-messages?populate[playlist][fields][0]=slug&populate[audio][fields][0]=alternativeText&populate[audio][fields][1]=url';
+    case "snippets": {
+      const url =
+        "http://localhost:1337/api/audio-messages?populate[playlist][fields][0]=slug&populate[audio][fields][0]=alternativeText&populate[audio][fields][1]=url";
 
-      // for testing purposes
-      const test_url = 'https://mocki.io/v1/82e531c2-4786-4c6c-b557-51d8e85e0823';
-
-      const { data: latestMessages } = useSWR(test_url);
+      const { data: latestMessages } = useSWR(url);
 
       if (!latestMessages) {
         return {
@@ -67,7 +41,6 @@ const useExtractFields = (fieldType) => {
         };
       }
 
-      // retrieve the nested array of the actual data we need
       const { data } = latestMessages;
 
       // Only 4 snippets can be exported
@@ -98,6 +71,68 @@ const useExtractFields = (fieldType) => {
     }
 
     default: {
+      /* Case specific endpoints */
+      if (typeof fieldType === "object") {
+        for (let key in fieldType) {
+          /* For single playlist */
+          if (key === "playlist") {
+            const url = `http://localhost:1337/api/playlists?filters[slug]=${fieldType[key]}&populate[0]=audio_messages.audio`;
+
+            const { data: playlist } = useSWR(url);
+
+            if (!playlist) {
+              return {
+                playlist: undefined,
+              };
+            }
+
+            const { data } = playlist;
+
+            const mappedData = [...data].map(
+              ({
+                attributes: {
+                  name,
+                  description,
+                  slug,
+                  audio_messages: { data },
+                },
+              }) => {
+                return {
+                  name,
+                  description,
+                  slug,
+                  audios: data.map(
+                    ({
+                      attributes: {
+                        title,
+                        description,
+                        slug,
+                        audio: {
+                          data: {
+                            attributes: { url },
+                          },
+                        },
+                      },
+                    }) => {
+                      return {
+                        title,
+                        description,
+                        slug,
+                        url,
+                      };
+                    }
+                  ),
+                };
+              }
+            );
+
+            return {
+              playlist: mappedData[0],
+            };
+          }
+        }
+      }
+
       console.error(
         `field type ${fieldType} is not applicable in hook useExtractorFields`
       );
