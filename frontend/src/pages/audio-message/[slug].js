@@ -1,21 +1,18 @@
-import { useEffect } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 
 import { useSWRAudioState } from '@/hooks/useSWRAudioState';
 
+import { ChevronRightIcon } from '@heroicons/react/24/solid';
+
 import AudioPlayer from '@/components/AudioPlayer';
 import AudioPlaylist from '@/components/AudioPlaylist';
 
-import { ChevronRightIcon } from '@heroicons/react/24/solid';
+import { truncateText } from '@/utils/truncateText';
 
 const AudioMessagePage = ({ data }) => {
-  // access url link to derive UI state from query
-  const router = useRouter();
-
-  const [, setPlayerDetails] = useSWRAudioState();
-
   // retrieve the data of the fetched audio message...
   // ...fro the nested response attributes in data)
   const { title, description, slug: audioSlug, playlist, audio } = data[0].attributes;
@@ -33,6 +30,17 @@ const AudioMessagePage = ({ data }) => {
       attributes: { url },
     },
   } = audio;
+
+  // access url link to derive UI state from query
+  const router = useRouter();
+
+  const [, setPlayerDetails] = useSWRAudioState();
+
+  const description_ref = useRef();
+
+  const revealFullDescription = useCallback(() => {
+    description_ref.current.innerText = description;
+  }, []);
 
   useEffect(() => {
     let mounted = true;
@@ -78,7 +86,14 @@ const AudioMessagePage = ({ data }) => {
           <section className="p-5 flex flex-col gap-5" role="details and more">
             <div className="flex flex-col gap-3" role="description">
               <p className="font-semibold text-base">Description</p>
-              <p className="text-sm text-justify text-black-300">{description}</p>
+              <p ref={description_ref} className="text-sm text-justify text-black-300">
+                {truncateText(description, 320, false)}
+                <span
+                  onClick={revealFullDescription}
+                  className="font-bold text-black-300">
+                  ...Read more
+                </span>
+              </p>
             </div>
           </section>
         </article>
