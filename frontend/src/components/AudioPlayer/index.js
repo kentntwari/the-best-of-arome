@@ -1,15 +1,17 @@
-import { useEffect } from 'react';
+import { useEffect } from "react";
 
-import { useAudioPlayer } from '@/hooks/useAudioPlayer';
-import { usePlayerContext } from '@/hooks/usePlayerContext';
+import { useRouter } from "next/router";
 
-import Play from './Play';
-import Pause from './Pause';
-import Back from './Back';
-import Forward from './Forward';
-import Duration from './Duration';
-import CurrentTime from './CurrentTime';
-import ProgressBar from './ProgressBar';
+import { useAudioPlayer } from "@/hooks/useAudioPlayer";
+import { usePlayerContext } from "@/hooks/usePlayerContext";
+
+import Play from "./Play";
+import Pause from "./Pause";
+import Back from "./Back";
+import Forward from "./Forward";
+import Duration from "./Duration";
+import CurrentTime from "./CurrentTime";
+import ProgressBar from "./ProgressBar";
 
 const AudioPlayer = ({
   enableDefaultFileReadings = true,
@@ -17,12 +19,15 @@ const AudioPlayer = ({
   enableCustomization = false,
   children,
 }) => {
+  const router = useRouter();
+
   const { methods } = useAudioPlayer();
   const context = usePlayerContext();
 
   useEffect(() => {
-    methods.pauseAudio();
-  }, []);
+    if (router.pathname === "/audio-message/[slug]" && !router.query.playlist)
+      methods.pauseAudio();
+  }, [router.pathname]);
 
   if (enableCustomization === true) {
     enableDefaultControls = false;
