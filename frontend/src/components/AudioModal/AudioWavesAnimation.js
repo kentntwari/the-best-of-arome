@@ -1,10 +1,10 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef } from "react";
 
-import Lottie from 'lottie-react';
+import Lottie from "lottie-react";
 
-import { usePlayerContext } from '@/hooks/usePlayerContext';
+import { usePlayerContext } from "@/hooks/usePlayerContext";
 
-import audioWavesAnimation from '../../../public/audio-waves.json';
+import audioWavesAnimation from "../../../public/audio-waves.json";
 
 const AudioWavesAnimation = () => {
   const wavesAnimation_ref = useRef();
@@ -20,8 +20,7 @@ const AudioWavesAnimation = () => {
     <div
       className="h-[134px] flex place-content-center"
       style={{
-        background:
-          'radial-gradient(50% 50.00% at 50% 50.00%, #FFB456 0%, rgba(255, 180, 86, 0.70) 100%)',
+        background: "var(--bg-audioWaves)",
       }}>
       <Lottie
         lottieRef={wavesAnimation_ref}
