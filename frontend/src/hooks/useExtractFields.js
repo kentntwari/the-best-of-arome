@@ -1,6 +1,8 @@
+import { useRouter } from "next/router";
+
 import useSWR from "swr";
 
-const useExtractFields = (fieldType) => {
+const useExtractFields = (fieldType, options = {}) => {
   /* General endpoints for pool of elements not too deeply nested */
   switch (fieldType) {
     case "playlists": {
@@ -67,6 +69,73 @@ const useExtractFields = (fieldType) => {
             };
           }
         ),
+      };
+    }
+
+    case "next in queue": {
+      const router = useRouter();
+
+      if (options === {}) return;
+
+      if (router.query.q) {
+        const url = `http://localhost:1337/api/audio-messages?filters[playlist][slug][$eq]=${options.playlist}`;
+
+        const { data: rawQueue } = useSWR(url);
+
+        if (!rawQueue) {
+          return {
+            nextInqueue: undefined,
+          };
+        }
+
+        const { data } = rawQueue;
+
+        const normalizedQueue = [...data].map(({ attributes: { title, slug } }) => {
+          return { title, slug };
+        });
+
+        const currentAudioPlayingIndex = [...data].findIndex(
+          ({ attributes: { slug } }) => slug === router.query.slug
+        );
+
+        return {
+          nextInqueue:
+            normalizedQueue[parseInt(currentAudioPlayingIndex) + 1] ?? normalizedQueue[0],
+        };
+      }
+
+      // define custom fetcher process for custom results
+      const fetchNextAudioById = async () =>
+        await fetch(
+          `http://localhost:1337/api/audio-messages?filters[id][$eq]=${options.id}`
+        ).then((res) => res.json());
+
+      const fetchFromTop = () =>
+        fetch(`http://localhost:1337/api/audio-messages?filters[id][$eq]=1`).then((res) =>
+          res.json()
+        );
+
+      const fetcher = async () => {
+        const initResponse = await fetchNextAudioById();
+
+        if (initResponse?.data?.length === 0) return await fetchFromTop();
+
+        return await fetchNextAudioById();
+      };
+
+      // use useSWR uniquely when fetching next audio to play
+      const { data: raw } = useSWR("next", fetcher);
+
+      if (!raw) {
+        return {
+          nextInqueue: undefined,
+        };
+      }
+
+      return {
+        nextInqueue: raw.data.map(({ attributes: { title, slug } }) => {
+          return { title, slug };
+        })[0],
       };
     }
 
