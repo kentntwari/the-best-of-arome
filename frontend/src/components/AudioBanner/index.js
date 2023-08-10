@@ -20,12 +20,12 @@ const AudioBanner = () => {
 
       {context.globalAudioState.isPlaying && (
         <div
-          className="my-6 mx-5 p-2 bg-white-300 flex items-center gap-2"
+          className="bg-white-300 dark:bg-black-300 my-6 mx-5 p-2  flex items-center gap-2"
           onClick={() => openModal()}>
-          <span className="px-2 py-1 rounded bg-ls-400 text-sm text-white-300">
+          <span className="bg-ls-400 dark:bg-dp-75 px-2 py-1 rounded text-sm text-white-300 dark:text-black-300">
             Playing...
           </span>
-          <span className="text-sm text-black-300">
+          <span className="text-sm text-black-300 dark:text-white-300">
             {truncateText(context.globalAudioState.title, 30)}
           </span>
         </div>
