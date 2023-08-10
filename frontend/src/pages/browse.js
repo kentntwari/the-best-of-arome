@@ -30,7 +30,7 @@ const Browse = () => {
               <Fragment key={uuidv4()}>
                 <Link href={`/browse/?playlist=${playlist.slug}`}>
                   <div
-                    className={`bg-ls-300 hover:bg-ls-400 px-4 py-6 ${
+                    className={`bg-ls-300 dark:bg-dp-300 hover:bg-ls-400 dark:hover:bg-dp-400 px-4 py-6 ${
                       index === 0 && "rounded-t-lg"
                     } ${
                       index === arr.length - 1 && "rounded-b-lg"
