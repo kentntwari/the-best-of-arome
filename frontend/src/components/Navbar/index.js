@@ -1,5 +1,5 @@
-import Link from 'next/link';
-import Logo from './Logo';
+import Link from "next/link";
+import Logo from "./Logo";
 
 const Navbar = () => {
   return (
@@ -7,10 +7,10 @@ const Navbar = () => {
       <Logo />
 
       <div id="menu" className="flex items-center gap-3 cursor-pointer">
-        <Link href="/browse" className="text-sm text-ls-400">
+        <Link href="/browse" className="text-sm text-ls-400 dark:text-white-300">
           Browse
         </Link>
-        <span className="text-sm text-ls-400">Search</span>
+        <span className="text-sm text-ls-400 dark:text-white-300">Search</span>
       </div>
     </nav>
   );
