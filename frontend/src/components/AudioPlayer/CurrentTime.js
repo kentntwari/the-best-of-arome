@@ -5,7 +5,7 @@ import useContextAnimationFrame from '@/hooks/useContextAnimationFrame';
 
 import { convertToMinutesSeconds } from '../../utils/convertToMinutesSeconds';
 
-const CurrentTime = ({ children }) => {
+const CurrentTime = ({ children, fontSize = null, fontWeight = null, color = null }) => {
   const currentTime_ref = useRef();
 
   const { player } = useAudioPlayer();
@@ -13,11 +13,13 @@ const CurrentTime = ({ children }) => {
   useContextAnimationFrame(() => {
     if (currentTime_ref.current)
       currentTime_ref.current.innerText =
-        convertToMinutesSeconds(player?.currentTime) ?? '00:00';
+        convertToMinutesSeconds(player?.currentTime) ?? "00:00";
   });
 
   return (
-    <span className={`text-xs`} ref={currentTime_ref}>
+    <span
+      className={`${fontSize ?? "text-xs"} ${fontWeight && fontWeight} ${color ?? color}`}
+      ref={currentTime_ref}>
       {children}
     </span>
   );

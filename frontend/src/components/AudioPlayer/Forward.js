@@ -1,16 +1,16 @@
-import { memo } from 'react';
+import { memo } from "react";
 
-import { useAudioPlayer } from '@/hooks/useAudioPlayer';
+import { useAudioPlayer } from "@/hooks/useAudioPlayer";
 
-import { ForwardIcon } from '@heroicons/react/24/solid';
+import { ForwardIcon } from "@heroicons/react/24/solid";
 
-const Forward = ({ overrideForwardEvent = null }) => {
+const Forward = ({ overrideForwardEvent = null, width = null, color = null }) => {
   const { methods } = useAudioPlayer();
 
   return (
     <ForwardIcon
       onClick={!overrideForwardEvent ? methods.forwardAudio : overrideForwardEvent}
-      className={`w-7.5 text-ls-300 cursor-pointer`}
+      className={`${width ?? "w-7.5"} ${color && color} cursor-pointer`}
     />
   );
 };

@@ -12,7 +12,7 @@ const ProgressBar = ({ variant = '', overrideSeekingEvent = null }) => {
     if (progressBar_ref.current) {
       progressBar_ref.current.value = (player?.currentTime / player?.duration) * 100;
       progressBar_ref.current.style.background = `linear-gradient(to right,${
-        variant === '' ? '#ae7137' : variant
+        variant === "" ? "var(--bg-progressBar-slider-track)" : variant
       } 0 ${progressBar_ref.current.value}%,#dedede 0)`;
     }
   });
