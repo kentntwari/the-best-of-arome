@@ -15,9 +15,16 @@ export default function App({ Component, pageProps }) {
       value={{
         fetcher: (...args) => fetch(...args).then((res) => res.json()),
         revalidateOnFocus: false,
+        onErrorRetry: (err, key, config, revalidate, { retryCount }) => {
+          // Only retry up to 10 times.
+          if (retryCount >= 4) return;
+
+          // Retry after 5 seconds.
+          setTimeout(() => revalidate({ retryCount }), 5000);
+        },
       }}>
       <div
-        className={`min-h-screen mx-auto flex flex-col ${poppins.variable} font-sans font-normal`}>
+        className={`min-h-screen min-w-[335px] mx-auto overflow-auto flex flex-col ${poppins.variable} font-sans font-normal`}>
         <PlayerProvider>
           <Layout>
             <Component {...pageProps} />
