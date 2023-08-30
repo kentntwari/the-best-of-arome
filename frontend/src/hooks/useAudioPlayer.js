@@ -4,7 +4,6 @@ const useAudioPlayer = () => {
   const context = usePlayerContext();
   let player = context.ref;
 
-  // save play audio function
   const playAudio = () => {
     context.forceGlobalAudioState.toPlay();
 
@@ -12,7 +11,6 @@ const useAudioPlayer = () => {
     if (isPlaying === true) setTimeout(() => player?.play(), 20);
   };
 
-  // save pause audio function
   const pauseAudio = () => {
     context.forceGlobalAudioState.toPause();
 
@@ -27,19 +25,15 @@ const useAudioPlayer = () => {
     player.currentTime = (player?.duration * e.target.value) / 100;
   };
 
-  // method to jump forward 0.5s of the current time...
-  // ...will freeze when it reached audio duration
+  // method to jump forward 0.5s of the current time
   const forwardAudio = () => {
     if (player?.currentTime < player?.duration) player.currentTime += 0.5;
   };
 
-  // method to jump backwards 0.5s of the current time...
-  // ...will freeze when it reached audio duration
+  // method to jump backwards 0.5s of the current time
   const backwardAudio = () => {
     if (player?.currentTime >= 0) player.currentTime -= 0.5;
   };
-
-  /* EXPORTED COMPONENTS */
 
   return {
     player,
