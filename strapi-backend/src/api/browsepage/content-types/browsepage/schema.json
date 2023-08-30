@@ -1,0 +1,31 @@
+{
+  "kind": "singleType",
+  "collectionName": "browsepages",
+  "info": {
+    "singularName": "browsepage",
+    "pluralName": "browsepages",
+    "displayName": "Browsepage",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "headertext": {
+      "type": "string",
+      "required": false
+    },
+    "coverimage": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    }
+  }
+}
