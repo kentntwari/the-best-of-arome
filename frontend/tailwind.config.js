@@ -128,16 +128,12 @@ module.exports = {
       boxShadow: {
         black: "2px -8px 40px 4px rgba(0,0,0,0.2)",
         white: "2px -8px 40px 4px rgba(255,255,255,0.2)",
-        light: {
-          primary: "2px -8px 40px 4px rgba(255,171,90,0.2)",
-          secondary: "2px -8px 40px 4px rgba(255,204,140,0.2)",
-          primary: "2px -8px 40px 4px rgba(206,206,206,0.2)",
-        },
-        dark: {
-          primary: "2px -8px 40px 4px rgba(92,81,255,0.2)",
-          secondary: "2px -8px 40px 4px rgba(3,153,255,0.2)",
-          primary: "2px -8px 40px 4px rgba(235,235,235,0.2)",
-        },
+        lp: "2px -8px 40px 4px rgba(255,171,90,0.2)", //light primary
+        ls: "2px -8px 40px 4px rgba(255,204,140,0.2)", //light secondary
+        ln: "2px -8px 40px 4px rgba(206,206,206,0.2)", //light neutral
+        dp: "2px -8px 40px 4px rgba(92,81,255,0.2)", //dark primary
+        ds: "2px -8px 40px 4px rgba(3,153,255,0.2)", //dark secondary
+        dn: "2px -8px 40px 4px rgba(235,235,235,0.2)", //dark neutral
       },
       gap: {
         15: "3.75rem",
