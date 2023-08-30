@@ -67,7 +67,7 @@ const AudioModal = forwardRef((props, ref) => {
             pathname: "/audio-message/[slug]/",
             query: {
               slug: playerDetails.slug,
-              q: props.playlist ? props.playlist : null,
+              q: props.mapQueue ? props.mapQueue : null,
             },
           }}
           className="flex self-center">
