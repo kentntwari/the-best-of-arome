@@ -1,19 +1,29 @@
-import { Fragment } from 'react';
+import { Fragment } from "react";
 
-import { v4 as uuidv4 } from 'uuid';
+import useSWR from "swr";
 
-import { useExtractFields } from '@/hooks/useExtractFields';
+import { v4 as uuidv4 } from "uuid";
 
-import Snippet from './Snippet';
+import Snippet from "./Snippet";
+import * as Skeletons from "@/components/Skeletons";
 
 const Snippets = () => {
-  const { snippets } = useExtractFields('snippets');
+  const { data: snippets } = useSWR("http://localhost:1337/api/get-snippets");
 
-  if (!snippets) return;
+  if (!snippets)
+    return (
+      <>
+        {new Array(4).fill(null).map((item) => (
+          <Fragment key={uuidv4()}>
+            <Skeletons.SnippetSkeleton />
+          </Fragment>
+        ))}
+      </>
+    );
 
   return (
     <>
-      {snippets.map((details) => (
+      {snippets?.map((details) => (
         <Fragment key={uuidv4()}>
           <Snippet {...details} />
         </Fragment>
