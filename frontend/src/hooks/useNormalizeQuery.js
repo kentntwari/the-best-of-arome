@@ -83,20 +83,7 @@ const useNormalizeQuery = (fieldType, options = {}) => {
             playlist: undefined,
           };
         }
-
-        // const catalogue = [...playlist][0].catalogue.map(
-        //   ({ title, description, slug, duration, publicID, url }) => {
-        //     return {
-        //       title,
-        //       description,
-        //       slug,
-        //       duration,
-        //       publicID,
-        //       url,
-        //     };
-        //   }
-        // );
-
+        
         return {
           playlist,
         };
