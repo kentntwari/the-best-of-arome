@@ -1,4 +1,4 @@
+import Cued from "./Cued";
 import Snippets from "./Snippets";
-import NextInQueue from "./NextInQueue";
 
-export { Snippets, NextInQueue };
+export { Cued, Snippets };
