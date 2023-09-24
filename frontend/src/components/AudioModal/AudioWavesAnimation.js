@@ -1,15 +1,17 @@
-import { useEffect, useRef } from "react";
+import { memo, useEffect, useRef } from "react";
 
 import Lottie from "lottie-react";
 import { useSnapshot } from "valtio";
 
-import { valtioProxyStore as _ } from "@/store/valtioProxyStore";
+import { singleAudioProxyStore as store } from "@/store";
 
 import audioWavesAnimation from "../../../public/audio-waves.json";
 
+const MemoizedLottie = memo(Lottie);
+
 const AudioWavesAnimation = () => {
   const wavesAnimation_ref = useRef();
-  const snap = useSnapshot(_);
+  const snap = useSnapshot(store);
 
   useEffect(() => {
     if (!snap.isPlaying) wavesAnimation_ref.current.stop();
@@ -22,7 +24,7 @@ const AudioWavesAnimation = () => {
       style={{
         background: "var(--bg-audioWaves)",
       }}>
-      <Lottie
+      <MemoizedLottie
         lottieRef={wavesAnimation_ref}
         animationData={audioWavesAnimation}
         loop={snap.isPlaying ? true : false}
