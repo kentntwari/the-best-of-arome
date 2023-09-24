@@ -5,8 +5,7 @@ import Link from "next/link";
 import { v4 as uuidv4 } from "uuid";
 
 import { useFuzzySearch } from "@/hooks/useFuzzySearch";
-import { useIsClickOutsideComponent } from "@/hooks/useIsClickOutsideComponent";
-
+import { useIsClickOutside } from "@/hooks/useIsClickOutside";
 
 import { MagnifyingGlassIcon } from "@heroicons/react/24/solid";
 
@@ -15,12 +14,14 @@ const Search = forwardRef((props, ref) => {
 
   const [data, searchFn] = useFuzzySearch();
 
-  const isClickOutsideComponent = useIsClickOutsideComponent(form_ref);
+  const isClickOutsideComponent = useIsClickOutside(form_ref);
 
   return (
     <div
       ref={ref}
-      className={`${isClickOutsideComponent ? 'hidden' : 'block'} xl:block xl:w-[412px] absolute xl:static left-0 -bottom-10 z-100 xl:z-10 px-5 w-full`}>
+      className={`${
+        isClickOutsideComponent ? "hidden" : "block"
+      } xl:block xl:w-[412px] absolute xl:static left-0 -bottom-10 z-100 xl:z-10 px-5 w-full`}>
       <search>
         <form
           ref={form_ref}
