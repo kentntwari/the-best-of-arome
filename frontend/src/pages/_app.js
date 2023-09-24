@@ -2,36 +2,44 @@ import Script from "next/script";
 
 import { SWRConfig } from "swr";
 
-import { PlayerProvider } from "@/context/PlayerContext";
-
 import Layout from "@/components/Layout";
 
 import "../styles/globals.css";
-import { poppins } from "@/styles/fonts";
 
 export default function App({ Component, pageProps }) {
   return (
     <SWRConfig
       value={{
-        fetcher: (...args) => fetch(...args).then((res) => res.json()),
+        fetcher: (...args) =>
+          fetch(...args).then((res) => {
+            if (!res.ok) {
+              const error = new Error("An error occurred while fetching the data.");
+              // Attach extra info to the error object.
+              error.info = res.json();
+              error.status = res.status;
+              throw error;
+            }
+
+            return res.json();
+          }),
+        keepPreviousData: true,
         revalidateOnFocus: false,
         onErrorRetry: (err, key, config, revalidate, { retryCount }) => {
           // Only retry up to 10 times.
-          if (retryCount >= 4) return;
+          if (retryCount >= 10) return;
 
           // Retry after 5 seconds.
-          setTimeout(() => revalidate({ retryCount }), 5000);
+          setTimeout(() => revalidate({ retryCount }), 2500);
         },
       }}>
       <div
-        className={`min-h-screen min-w-[335px] mx-auto overflow-auto flex flex-col ${poppins.variable} font-sans font-normal`}>
-        <PlayerProvider>
-          <Layout>
-            <Component {...pageProps} />
+        className={`min-h-screen min-w-[335px] xl:max-w-7xl mx-auto overflow-auto flex flex-col  font-sans font-normal`}>
+        <Layout>
+          <Component {...pageProps} />
 
-            {/* DARK MODE SCRIPT */}
-            <Script id="application-theme" strategy="beforeInteractive">
-              {`if(!localStorage?.getItem("theme") 
+          {/* DARK MODE SCRIPT */}
+          <Script id="application-theme" strategy="beforeInteractive">
+            {`if(!localStorage?.getItem("theme") 
                     && window.matchMedia('(prefers-color-scheme: dark)').matches 
                   )
                     {
@@ -63,9 +71,8 @@ export default function App({ Component, pageProps }) {
                     document?.documentElement.setAttribute("data-theme", "light");
                   }
               `}
-            </Script>
-          </Layout>
-        </PlayerProvider>
+          </Script>
+        </Layout>
       </div>
     </SWRConfig>
   );
