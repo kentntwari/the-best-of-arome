@@ -3,11 +3,13 @@ const LineSkeleton = ({
   height = "h-4",
   bgColor = "bg-gradient-to-r from-ls-300 dark:from-dp-100 via-ls-100 dark:via-dp-100",
   animation = "animate-pulse",
-  customClasses = "",
+  className = "",
+  children,
 }) => {
   return (
-    <span
-      className={`${width} ${height} ${bgColor} ${animation} ${customClasses}`}></span>
+    <span className={`${width} ${height} ${bgColor} ${animation} ${className}`}>
+      {children}
+    </span>
   );
 };
 
@@ -16,11 +18,14 @@ const CircleSkeleton = ({
   height = "h-4",
   bgColor = "bg-gradient-to-r from-ls-300 dark:from-dp-100 via-ls-100 dark:via-dp-100",
   animation = "animate-pulse",
-  customClasses = "",
+  className = "",
+  children,
 }) => {
   return (
     <span
-      className={`${width} ${height} ${bgColor} ${animation} rounded-full ${customClasses}`}></span>
+      className={`${width} ${height} ${bgColor} ${animation} rounded-full ${className}`}>
+      {children}
+    </span>
   );
 };
 

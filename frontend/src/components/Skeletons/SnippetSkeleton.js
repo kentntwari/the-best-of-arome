@@ -1,8 +1,8 @@
-import * as Shapes from "./Shapes";
+import * as Shapes from "./ShapeSkeleton";
 
 const SnippetSkeleton = () => {
   return (
-    <div className="p-5 flex flex-col gap-5 bg-la-300 dark:bg-dp-200 opacity-70 rounded-lg">
+    <div className="xl:w-80 p-5 flex flex-col gap-5 bg-la-300 dark:bg-dp-200 opacity-70 rounded-lg">
       <div className="w-full flex flex-col gap-2">
         <Shapes.LineSkeleton width="w-full" />
         <Shapes.LineSkeleton width="w-10/12" />
