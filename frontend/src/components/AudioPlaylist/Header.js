@@ -1,21 +1,47 @@
-import Link from "next/link";
+import { useRouter } from "next/router";
 
-const Header = ({ children }) => {
+import { v4 as uuidv4 } from "uuid";
+
+import useSWR from "swr";
+
+import * as Shapes from "@/components/Skeletons/ShapeSkeleton";
+
+const Header = () => {
+  const router = useRouter();
+
+  const { data: playlists } = useSWR("http://localhost:1337/api/playlists");
+
   return (
     <>
-      <Link
-        href="/browse"
-        className="underline underline-offset-3 text-sm text-neutral-200 dark:text-neutral-20 decoration-neutral-200">
-        Back to browse
-      </Link>
-
       <header
-        className="mt-6 px-3 py-4 rounded-lg bg-la-300 dark:bg-black-300 flex flex-col gap-3"
+        className="min-h-[12rem] px-3 py-4 rounded-lg bg-la-300 dark:bg-black-300 flex flex-col gap-3"
         aria-label="playlist header">
         <span className="w-fit px-3 py-2 rounded-full bg-white-300 text-xs text-black-300">
           Playlist
         </span>
-        <div>{children}</div>
+        {!playlists && (
+          <>
+            <Shapes.LineSkeleton width="w-1/2" height="h-8" />
+            <Shapes.LineSkeleton />
+          </>
+        )}
+
+        {playlists
+          ?.filter(({ slug }) => slug === router.query.playlist)
+          .map(({ name, description }) => (
+            <div key={uuidv4()}>
+              <h3
+                className="capitalize font-semibold text-black-300 dark:text-white-300"
+                aria-label="playlist title">
+                {name}
+              </h3>
+              <p
+                className="mt-2 text-xs text-black-300 dark:text-white-300"
+                aria-label="playlist description">
+                {description}
+              </p>
+            </div>
+          ))}
       </header>
     </>
   );
