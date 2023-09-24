@@ -1,14 +1,16 @@
-import { useEffect } from 'react';
+import { useEffect } from "react";
 
-import { usePlayerContext } from './usePlayerContext';
+import { useSnapshot } from "valtio";
+
+import { singleAudioProxyStore as store } from "@/store";
 
 const useContextAnimationFrame = (functionToRun) => {
-  if (typeof functionToRun !== 'function')
+  if (typeof functionToRun !== "function")
     console.error(
-      'argument in hook useRequestAnimationFrame is not a function. This hook requires a function to run'
+      "argument in hook useRequestAnimationFrame is not a function. This hook requires a function to run"
     );
 
-  const context = usePlayerContext();
+  const snap = useSnapshot(store);
 
   let animate = false;
 
@@ -21,16 +23,16 @@ const useContextAnimationFrame = (functionToRun) => {
   }
 
   useEffect(() => {
-    if (context.globalAudioState.isPlaying === true) {
+    if (snap.isPlaying === true) {
       animate = true;
       window.requestAnimationFrame(update);
     }
 
-    if (context.globalAudioState.isPlaying === false) {
+    if (snap.isPlaying === false) {
       animate = false;
       window.cancelAnimationFrame(update);
     }
-  }, [context.globalAudioState.isPlaying]);
+  }, [snap.isPlaying]);
 };
 
-export default useContextAnimationFrame;
+export { useContextAnimationFrame };
