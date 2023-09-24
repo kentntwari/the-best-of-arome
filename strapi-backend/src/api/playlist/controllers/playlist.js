@@ -11,22 +11,14 @@ const { createCoreController } = require("@strapi/strapi").factories;
 // reusable function to generate better syntax
 function formatEntries(entries) {
   if (entries && entries?.length > 0)
-    return entries?.map((entry) => {
+    return entries[0]?.audio_messages?.map((single) => {
       return {
-        id: entry?.id,
-        name: entry?.name,
-        description: entry?.description,
-        slug: entry?.slug,
-        catalogue: entry?.audio_messages?.map((single) => {
-          return {
-            id: single?.id,
-            title: single?.title,
-            slug: single?.slug,
-            duration: single?.audio?.size,
-            publicID: single?.audio?.provider_metadata?.public_id,
-            url: single?.audio?.url,
-          };
-        }),
+        id: single?.id,
+        title: single?.title,
+        slug: single?.slug,
+        duration: single?.audio?.size,
+        publicID: single?.audio?.provider_metadata?.public_id,
+        url: single?.audio?.url,
       };
     });
 }
@@ -37,9 +29,10 @@ module.exports = createCoreController(
     async find(ctx) {
       const { data } = await super.find(ctx);
 
-      return data.map(({ attributes: { name, slug } }) => {
+      return data.map(({ attributes: { name, description, slug } }) => {
         return {
           name,
+          description,
           slug,
         };
       });
@@ -47,12 +40,10 @@ module.exports = createCoreController(
 
     async findByPlaylist(ctx) {
       try {
-        // raw data
-        const { meta } = await super.find(ctx);
         const entries = await strapi.entityService.findMany(
           "api::playlist.playlist",
           {
-            fields: ["name", "description", "slug"],
+            // fields: ["name", "description", "slug"],
             populate: {
               audio_messages: {
                 fields: ["id", "title", "description", "slug"],
@@ -76,29 +67,18 @@ module.exports = createCoreController(
 
         switch (ctx.query.sortBy) {
           case "duration": {
-            return formatEntries([...entries]).map((item) => {
-              return {
-                ...item,
-                catalogue: item.catalogue.sort((a, b) => {
-                  if (ctx.query.order === "desc")
-                    return b?.duration - a?.duration;
+            return formatEntries([...entries])?.sort((a, b) => {
+              if (ctx.query.order === "desc") return b?.duration - a?.duration;
 
-                  return a?.duration - b?.duration;
-                }),
-              };
+              return a?.duration - b?.duration;
             });
           }
 
           case "id": {
-            return formatEntries([...entries]).map((item) => {
-              return {
-                ...item,
-                catalogue: item.catalogue.sort((a, b) => {
-                  if (ctx.query.order === "desc") return b?.id - a?.id;
+            return formatEntries([...entries]).sort((a, b) => {
+              if (ctx.query.order === "desc") return b?.id - a?.id;
 
-                  return a?.id - b?.id;
-                }),
-              };
+              return a?.id - b?.id;
             });
           }
 
