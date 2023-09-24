@@ -29,6 +29,7 @@ const SwitchTheme = () => {
     if (mounted && theme) {
       window.localStorage.removeItem("theme");
       window.localStorage.setItem("theme", theme);
+      document?.documentElement?.setAttribute("data-theme", theme);
     }
 
     return () => {
@@ -41,7 +42,7 @@ const SwitchTheme = () => {
       {theme && (
         <button
           onClick={toggleTheme}
-          className="fixed left-5 bottom-4 z-20 flex items-center appearance-none outline-none cursor-pointer"
+          className="fixed left-5 bottom-4 z-100 flex items-center appearance-none outline-none cursor-pointer"
           type="button"
           name="theme-switcher">
           <div className="opacity-60 dark:opacity-100 bg-neutral-40 dark:bg-dp-300 w-11 h-9 flex place-content-center rounded-tl rounded-bl">
