@@ -1,14 +1,19 @@
-import { Fragment, useState } from "react";
+import { Fragment, useState, useRef } from "react";
 
 import Link from "next/link";
 import Head from "next/head";
 
 import useSWR from "swr";
 
-import { CldImage } from "next-cloudinary";
 import { v4 as uuidv4 } from "uuid";
 
-import { ArrowRightIcon } from "@heroicons/react/24/solid";
+import { CldImage } from "next-cloudinary";
+import * as Dialog from "@radix-ui/react-dialog";
+import {
+  ArrowRightIcon,
+  XCircleIcon,
+  ChevronDoubleDownIcon,
+} from "@heroicons/react/24/solid";
 
 import * as Skeletons from "@/components/Skeletons";
 import * as AudioMessage from "@/components/AudioMessage";
@@ -46,6 +51,9 @@ export default function Home() {
 
   const { data } = useSWR("http://localhost:1337/api/homepage");
 
+  const homepageScreen_ref = useRef();
+  const snippets_ref = useRef();
+
   return (
     <>
       <Head>
@@ -62,9 +70,11 @@ export default function Home() {
         />
       </Head>
 
-      <div className="grow mt-6 lg:mt-12 px-5 lg:px-10">
-        <header className="relative flex flex-col gap-6 lg:gap-10 font-extrabold">
-          <h1 className="max-w-[335px] lg:max-w-none lg:text-7xl">
+      <div
+        ref={homepageScreen_ref}
+        className="grow mt-6 lg:mt-12 xl:mt-16 px-5 lg:px-10 xl:p-0">
+        <header className="relative flex flex-col xl:items-center gap-6 lg:gap-10 font-extrabold">
+          <h1 className="max-w-[335px] lg:max-w-none lg:text-7xl xl:text-8xl xl:text-center">
             {data?.coverText ? (
               data?.coverText
             ) : (
@@ -76,17 +86,15 @@ export default function Home() {
             )}
           </h1>
 
-          <div className="grid grid-cols-[minmax(141px,1fr)_minmax(176px,1fr)] lg:grid-cols-[244px_227px_244px] grid-rows-[repeat(2,100px)] lg:grid-rows-[repeat(7,minmax(38px,1fr))_28px] gap-4 lg:gap-y-0">
+          <div className="relative grid grid-cols-[minmax(141px,1fr)_minmax(176px,1fr)] lg:grid-cols-[244px_227px_244px] grid-rows-[repeat(2,100px)] lg:grid-rows-[repeat(7,minmax(38px,1fr))_28px] xl:justify-center gap-4 lg:gap-y-0">
             {!data && (
               <>
                 <Skeletons.ImageSkeleton
-                  customClasses={defineCoverImagesClasses.centerImage}
+                  className={defineCoverImagesClasses.centerImage}
                 />
+                <Skeletons.ImageSkeleton className={defineCoverImagesClasses.leftImage} />
                 <Skeletons.ImageSkeleton
-                  customClasses={defineCoverImagesClasses.leftImage}
-                />
-                <Skeletons.ImageSkeleton
-                  customClasses={defineCoverImagesClasses.rightImage}
+                  className={defineCoverImagesClasses.rightImage}
                 />
               </>
             )}
@@ -108,10 +116,7 @@ export default function Home() {
                       onError={() => setShowSkeleton(true)}
                       onLoad={() => setShowSkeleton(true)}
                       onLoadingComplete={() => setShowSkeleton(false)}
-                      className="rounded-lg"
-                      style={{
-                        objectFit: "cover",
-                      }}
+                      className="rounded-lg object-cover"
                     />
                   )}
                 </GridImagesWrapper>
@@ -129,8 +134,26 @@ export default function Home() {
           </div>
         </header>
 
-        <main className="mt-20 mb-6 flex flex-col gap-4">
-          <div className="flex items-center justify-between">
+        <Dialog.Root>
+          <Dialog.Trigger className="relative hidden xl:block w-full mt-20 uppercase font-semibold text-xs tracking-wide cursor-pointer z-10">
+            <span>Discover latest messages</span>
+            <ChevronDoubleDownIcon className="w-7 m-auto pt-6 animate-bounce" />
+          </Dialog.Trigger>
+          <Dialog.Portal>
+            <Dialog.Overlay className="xl:bg-overlay-snippets">
+              <Dialog.Content className="xl:mt-0 xl:mb-2 xl:w-full xl:fixed xl:right-0 xl:bottom-0 xl:z-20 xl:flex xl:flex-col xl:gap-4">
+                <Dialog.Close className="xl:m-auto flex items-center gap-2 text-white-300">
+                  <XCircleIcon className="w-5 cursor-pointer" />
+                  <span>Close latest</span>
+                </Dialog.Close>
+                <AudioMessage.Snippets />
+              </Dialog.Content>
+            </Dialog.Overlay>
+          </Dialog.Portal>
+        </Dialog.Root>
+
+        <main ref={snippets_ref} className="mt-20 mb-6 xl:hidden flex flex-col gap-4">
+          <div className="xl:hidden flex items-center justify-between">
             <p className="bg-white-300 px-3 py-2 text-xs lg:text-sm text-black-300 rounded-full">
               Latest messages
             </p>
@@ -140,9 +163,7 @@ export default function Home() {
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-            <AudioMessage.Snippets />
-          </div>
+          <AudioMessage.Snippets />
         </main>
       </div>
     </>
