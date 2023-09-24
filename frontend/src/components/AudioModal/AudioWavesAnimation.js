@@ -1,31 +1,31 @@
 import { useEffect, useRef } from "react";
 
 import Lottie from "lottie-react";
+import { useSnapshot } from "valtio";
 
-import { usePlayerContext } from "@/hooks/usePlayerContext";
+import { valtioProxyStore as _ } from "@/store/valtioProxyStore";
 
 import audioWavesAnimation from "../../../public/audio-waves.json";
 
 const AudioWavesAnimation = () => {
   const wavesAnimation_ref = useRef();
-
-  const context = usePlayerContext();
+  const snap = useSnapshot(_);
 
   useEffect(() => {
-    if (!context.globalAudioState.isPlaying) wavesAnimation_ref.current.stop();
-    if (context.globalAudioState.isPlaying) wavesAnimation_ref.current.play();
-  }, [context.globalAudioState.isPlaying]);
+    if (!snap.isPlaying) wavesAnimation_ref.current.stop();
+    if (snap.isPlaying) wavesAnimation_ref.current.play();
+  }, [snap.isPlaying]);
 
   return (
     <div
-      className="h-[134px] flex place-content-center"
+      className="h-[134px] lg:h-60 flex place-content-center"
       style={{
         background: "var(--bg-audioWaves)",
       }}>
       <Lottie
         lottieRef={wavesAnimation_ref}
         animationData={audioWavesAnimation}
-        loop={context.globalAudioState.isPlaying ? true : false}
+        loop={snap.isPlaying ? true : false}
       />
     </div>
   );
