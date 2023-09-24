@@ -1,49 +1,114 @@
-import { usePlayerContext } from "./usePlayerContext";
+import React, { useState, useRef, useEffect } from "react";
 
 const useAudioPlayer = () => {
-  const context = usePlayerContext();
-  let player = context.ref;
+  // state
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [duration, setDuration] = useState(0);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [timeJump, setTimeJump] = useState(0);
 
-  const playAudio = () => {
-    context.forceGlobalAudioState.toPlay();
+  // references
+  const audioPlayer = useRef(null); // reference our audio component
+  const progressBar = useRef(null); // reference our progress bar
+  const animationRef = useRef(); // reference the animation
 
-    const isPlaying = !context.globalAudioState.isPlaying;
-    if (isPlaying === true) setTimeout(() => player?.play(), 20);
+  // handle time jumps
+  useEffect(() => {
+    timeTravel(timeJump);
+    // setIsPlaying(true);
+    // play();
+  }, [timeJump]);
+
+  // grabs the loaded metadata
+  useEffect(() => {
+    const seconds = Math.floor(audioPlayer.current.duration);
+    setDuration(seconds);
+    progressBar.current.max = seconds.toString();
+  }, [audioPlayer?.current?.onloadedmetadata, audioPlayer?.current?.readyState]);
+
+  // when you get to the end
+  useEffect(() => {
+    if (Number(duration) > 1 && Number(currentTime) === Number(duration)) {
+      togglePlayPause();
+      timeTravel(0);
+    }
+  }, [currentTime, duration]);
+
+  const calculateTime = (secs) => {
+    const minutes = Math.floor(secs / 60);
+    const returnedMinutes = minutes < 10 ? `0${minutes}` : `${minutes}`;
+    const seconds = Math.floor(secs % 60);
+    const returnedSeconds = seconds < 10 ? `0${seconds}` : `${seconds}`;
+    return `${returnedMinutes}:${returnedSeconds}`;
   };
 
-  const pauseAudio = () => {
-    context.forceGlobalAudioState.toPause();
-
-    const isPlaying = !context.globalAudioState.isPlaying;
-    if (isPlaying === false) setTimeout(() => player?.pause(), 20);
+  const play = () => {
+    audioPlayer.current.play();
+    animationRef.current = requestAnimationFrame(whilePlaying);
   };
 
-  // method for direct slider time change...
-  // ...this will immediately impact the current time...
-  // ... and appearance of the progress bar background
-  const seekTimeframe = (e) => {
-    player.currentTime = (player?.duration * e.target.value) / 100;
+  const togglePlayPause = () => {
+    const prevValue = isPlaying;
+    setIsPlaying(!prevValue);
+    if (!prevValue) {
+      play();
+    } else {
+      audioPlayer.current.pause();
+      cancelAnimationFrame(animationRef.current);
+    }
   };
 
-  // method to jump forward 0.5s of the current time
-  const forwardAudio = () => {
-    if (player?.currentTime < player?.duration) player.currentTime += 0.5;
+  const whilePlaying = () => {
+    progressBar.current.value = String(audioPlayer.current.currentTime);
+    changePlayerCurrentTime();
+    animationRef.current = requestAnimationFrame(whilePlaying);
   };
 
-  // method to jump backwards 0.5s of the current time
-  const backwardAudio = () => {
-    if (player?.currentTime >= 0) player.currentTime -= 0.5;
+  const changeRange = () => {
+    audioPlayer.current.currentTime = Number(progressBar.current.value);
+    changePlayerCurrentTime();
+  };
+
+  const changePlayerCurrentTime = () => {
+    progressBar.current.style.setProperty(
+      "--seek-before-width",
+      `${(Number(progressBar.current.value) / duration) * 100}%`
+    );
+
+    // progressBar.current.style.background = `linear-gradient(to right,
+    //     var(--bg-progressBar-slider-track) 0 ${progressBar_ref?.current?.value}%,#dedede 0)`;
+    setCurrentTime(Number(progressBar.current.value));
+  };
+
+  const backThirty = () => {
+    timeTravel(Number(progressBar.current.value) - 30);
+  };
+
+  const forwardThirty = () => {
+    timeTravel(Number(progressBar.current.value) + 30);
+  };
+
+  const timeTravel = (newTime) => {
+    progressBar.current.value = String(newTime);
+    changeRange();
   };
 
   return {
-    player,
-    methods: {
-      playAudio,
-      pauseAudio,
-      forwardAudio,
-      backwardAudio,
-      seekTimeframe,
-    },
+    isPlaying,
+    duration,
+    currentTime,
+    audioPlayer,
+    progressBar,
+    calculateTime,
+    togglePlayPause,
+    changeRange,
+    backThirty,
+    forwardThirty,
+    timeTravel,
+    setDuration,
+    setIsPlaying,
+    setTimeJump,
+    play,
   };
 };
 
