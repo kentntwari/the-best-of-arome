@@ -1,14 +1,21 @@
-import Link from 'next/link';
+import Link from "next/link";
 
-import { leagueSpartan } from '@/styles/fonts';
+import { leagueSpartan } from "@/styles/fonts";
 
 const Logo = () => {
   return (
     <Link
       href="/"
-      className={`text-umd ${leagueSpartan.className} leading-4.5 cursor-pointer`}
+      className={`text-umd lg:text-[1.5rem] ${leagueSpartan.className} leading-4.5 cursor-pointer`}
       aria-label="Logo">
-      The Best <br /> of Arome
+      <span className="xl:hidden">
+        The Best <br /> of Arome
+      </span>
+
+      <span className="hidden xl:block leading-[initial]">
+        The <br /> Best of
+        <br /> Arome
+      </span>
     </Link>
   );
 };
