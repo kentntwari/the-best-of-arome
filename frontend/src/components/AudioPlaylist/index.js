@@ -24,6 +24,7 @@ const AudioPlaylist = () => {
     let mounted = true;
 
     if (mounted && router.query.playlist) setOpen(true);
+    else if (mounted && !router.query.playlist) setOpen(false);
 
     return () => {
       mounted = false;
@@ -33,11 +34,15 @@ const AudioPlaylist = () => {
   return (
     <DialogPrimitive.Root open={open} onOpenChange={setOpen}>
       <DialogPrimitive.Portal>
-        <DialogPrimitive.Overlay className="fixed top-0 right-0 lg:w-full lg:h-full bg-gradient-to-l from-[rgba(106,69,34,1)] dark:from-black-300 via-[rgba(106,69,34,.4)] dark:via-[rgba(0,0,0,.4)] to-[rgba(106,69,34,.4)] dark:to-[rgba(0,0,0,.4)] z-[9999]">
+        <DialogPrimitive.Overlay
+          className="fixed top-0 right-0 w-full h-full bg-gradient-to-l from-[rgba(106,69,34,.2)] base:from-[rgba(106,69,34,1)]
+         dark:from-[rgba(0,0,0,.2)] base:dark:from-black-300 via-[rgba(106,69,34,.2)] base:via-[rgba(106,69,34,.4)]
+          dark:via-[rgba(0,0,0,.2)] base:dark:via-[rgba(0,0,0,.4)] to-[rgba(106,69,34,.2)] base:to-[rgba(106,69,34,.4)]
+           dark:to-[rgba(0,0,0,.2)] base:dark:to-[rgba(0,0,0,.4)] z-[9999]">
           <DialogPrimitive.Content
             onPointerDownOutside={goBack}
             onEscapeKeyDown={goBack}
-            className="lg:fixed lg:top-0 lg:right-0 lg:h-full row-span-full col-span-full px-5 py-4 bg-lp-300 lg:bg-white-300 dark:bg-dp-300 lg:dark:bg-dp-200 z-40 lg:w-[65%] xl:w-[37%] lg:justify-self-end">
+            className="fixed top-20 bottom-0 base:top-0 right-0 w-full base:w-[65%] base:max-w-[34rem] xl:w-[37%] lg:h-full px-5 py-4 bg-lp-300 dark:bg-dp-200 z-40 lg:justify-self-end overflow-scroll">
             <>
               <DialogPrimitive.Close asChild>
                 <button

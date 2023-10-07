@@ -7,26 +7,39 @@ function setDynamicPositionStyles(position, data) {
     return "invisible";
 }
 
-const Cued = ({ children, position, data, onClick }) => {
+const Cued = ({
+  children,
+  position,
+  data,
+  onClick,
+  width = "w-24 md:w-[72px]",
+  height = "h-24 md:h-[72px]",
+  bgColor = "bg-white-300 dark:bg-black-100",
+  className = null,
+}) => {
   return (
     <>
       <button
         type="button"
-        className={`${position === "previous" ? "lg:order-first" : "lg:order-last"}`}
+        className={`${position === "previous" ? "lg:order-first" : "lg:order-last"}${
+          className ? ` ${className}` : ""
+        }`}
         role={position === "previous" ? "previous-audio-message" : "next-audio-message"}
         disabled={data ? false : true}
         onClick={onClick}>
         <span
-          className={`lg:w-[72px] lg:h-[72px] bg-white-300 dark:bg-black-100 ${setDynamicPositionStyles(
+          className={`${width} ${height} ${bgColor} ${setDynamicPositionStyles(
             position,
             data
-          )} flex items-center justify-center rounded-full opacity-60 group-hover:opacity-100`}>
+          )} flex items-center justify-center rounded-full opacity-60 base:group-hover:opacity-100 group-active:opacity-60`}>
           {position === "previous" && !children ? (
-            <ChevronLeftIcon className="lg:w-10 lg:order-first" />
+            <ChevronLeftIcon className="w-10 lg:order-first" />
           ) : null}
+
           {position === "next" && !children ? (
-            <ChevronRightIcon className="lg:w-10 lg:order-first" />
+            <ChevronRightIcon className="w-10 lg:order-first" />
           ) : null}
+
           {children}
         </span>
       </button>

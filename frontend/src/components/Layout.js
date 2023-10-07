@@ -27,9 +27,7 @@ const Layout = ({ children }) => {
 
       <SwitchTheme />
 
-      <div className="grow grid grid-cols-3">
-        <div className="row-span-full col-span-full">{children}</div>
-      </div>
+      <div className="grow grid">{children}</div>
 
       <Footer />
     </>

@@ -9,7 +9,6 @@ export function optimizeURL({
   transformations = null,
 }) {
   /* FOR CLOUDINARY PROVIDER */
-
   // Create and configure your Cloudinary instance.
   const cld = new Cloudinary({
     cloud: {

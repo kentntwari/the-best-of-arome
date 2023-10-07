@@ -1,6 +1,7 @@
 import Script from "next/script";
 
 import { SWRConfig } from "swr";
+import { NextSeo } from "next-seo";
 
 import Layout from "@/components/Layout";
 
@@ -35,6 +36,11 @@ export default function App({ Component, pageProps }) {
       <div
         className={`min-h-screen min-w-[335px] xl:max-w-7xl mx-auto overflow-auto flex flex-col  font-sans font-normal`}>
         <Layout>
+          <NextSeo
+            description="Listen to compilations of Apostle Arome Osayi most inspirational audio messages excerpts"
+            titleTemplate="%s | The Best of Arome Osayi"
+            defaultTitle="The Best of Arome Osayi"
+          />
           <Component {...pageProps} />
 
           {/* DARK MODE SCRIPT */}

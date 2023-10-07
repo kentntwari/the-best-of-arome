@@ -1,14 +1,12 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useImperativeHandle, forwardRef } from "react";
 
 import { useSnapshot, subscribe } from "valtio";
 
-import { singleAudioProxyStore as _ } from "@/store";
+import { store as _ } from "@/store";
 
 import { optimizeURL } from "@/utils/optimizeURL";
 
-// configured the audio in its own component
-// to avoid re-renders caused by context
-const Wrapper = ({ children }) => {
+const Wrapper = forwardRef(({ children, fallBack, title }, ref) => {
   const snap = useSnapshot(_);
 
   const audio_ref = useRef();
@@ -23,16 +21,32 @@ const Wrapper = ({ children }) => {
     });
   }, []);
 
+  useImperativeHandle(
+    ref,
+    () => {
+      return {
+        exposeAudioCurrentTime() {
+          return audio_ref.current.currentTime;
+        },
+        exposeAudioDuration() {
+          return audio_ref.current.duration;
+        },
+      };
+    },
+    []
+  );
+
   return (
     <>
       <audio
         ref={audio_ref}
-        src={optimizeURL({ publicID: snap.currentAudio })}
+        src={optimizeURL({ publicID: snap.currentAudio }) ?? fallBack}
+        title={title}
         preload="metadata"
       />
       {children}
     </>
   );
-};
+});
 
 export default Wrapper;

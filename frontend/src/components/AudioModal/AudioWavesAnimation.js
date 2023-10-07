@@ -3,7 +3,7 @@ import { memo, useEffect, useRef } from "react";
 import Lottie from "lottie-react";
 import { useSnapshot } from "valtio";
 
-import { singleAudioProxyStore as store } from "@/store";
+import { store } from "@/store";
 
 import audioWavesAnimation from "../../../public/audio-waves.json";
 

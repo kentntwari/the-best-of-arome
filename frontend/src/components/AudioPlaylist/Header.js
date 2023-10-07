@@ -21,8 +21,8 @@ const Header = () => {
         </span>
         {!playlists && (
           <>
-            <Shapes.LineSkeleton width="w-1/2" height="h-8" />
-            <Shapes.LineSkeleton />
+            <Shapes.LineSkeleton width="w-1/2" height="h-6" />
+            <Shapes.LineSkeleton width="w-2/3" />
           </>
         )}
 
@@ -32,7 +32,7 @@ const Header = () => {
             <div key={uuidv4()}>
               <h3
                 className="capitalize font-semibold text-black-300 dark:text-white-300"
-                aria-label="playlist title">
+                aria-label={`${name} playlist`}>
                 {name}
               </h3>
               <p

@@ -25,7 +25,7 @@ const Catalogue = () => {
 
           <Filter />
         </div>
-        {!catalogue && <Shapes.LineSkeleton width="w-full" height="h-14" />}
+        {!catalogue && <Shapes.LineSkeleton width="w-1/2" height="h-10" />}
 
         {catalogue && (
           <ul className="border border-la-300 dark:border-dp-200">

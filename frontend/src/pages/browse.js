@@ -5,6 +5,7 @@ import Link from "next/link";
 import useSWR from "swr";
 
 import { v4 as uuidv4 } from "uuid";
+import { NextSeo } from "next-seo";
 import { CldImage } from "next-cloudinary";
 import { ArrowRightIcon } from "@heroicons/react/24/solid";
 
@@ -21,13 +22,14 @@ const Browse = () => {
 
   return (
     <>
-      <section className="mt-6 px-5 lg:px-10 flex flex-col gap-4">
+      <NextSeo title="Browse" description="Browse all audio messages by playlist" />
+      <section className="mt-6 px-5 md:px-10 flex flex-col gap-4">
         <header>
           {browseDetails?.coverText ? (
             browseDetails?.coverText
           ) : (
             <>
-              <h3 className="font-bold lg:text-center lg:text-4xl">
+              <h3 className="font-bold base:text-center lg:text-4xl">
                 Browse audio messages by playlist
               </h3>
             </>
@@ -80,8 +82,7 @@ const Browse = () => {
                 fill={true}
                 priority={true}
                 alt={browseDetails?.coverImage?.altText}
-                className="rounded-lg"
-                style={{ objectFit: "cover", objectPosition: "right 80% top 100%" }}
+                className="rounded-lg object-cover object-[80%_100%]"
               />
             </div>
           ) : null}

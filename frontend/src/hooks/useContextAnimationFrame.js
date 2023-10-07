@@ -2,7 +2,7 @@ import { useEffect } from "react";
 
 import { useSnapshot } from "valtio";
 
-import { singleAudioProxyStore as store } from "@/store";
+import { store } from "@/store";
 
 const useContextAnimationFrame = (functionToRun) => {
   if (typeof functionToRun !== "function")

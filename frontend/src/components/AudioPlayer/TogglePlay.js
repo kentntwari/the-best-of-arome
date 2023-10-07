@@ -1,6 +1,6 @@
 import { useSnapshot } from "valtio";
 
-import { singleAudioProxyStore as _ } from "@/store";
+import { store as _ } from "@/store";
 
 import { PauseCircleIcon, PlayCircleIcon } from "@heroicons/react/24/solid";
 

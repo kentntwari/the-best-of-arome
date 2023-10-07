@@ -35,18 +35,20 @@ const AudioModal = ({
               onPointerDownOutside={actions.reset}
               onEscapeKeyDown={actions.reset}
               className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-              <div className="group lg:flex lg:items-center lg:gap-10">
+              <div className="relative group lg:flex lg:items-center lg:gap-10">
                 {showCueControls ? (
                   <>
                     <AudioMessage.Cued
                       position="previous"
                       data={previous}
+                      className="fixed top-2/4 md:top-1/3 -left-12 md:-left-24 z-50"
                       onClick={actions.setPrevious}
                     />
 
                     <AudioMessage.Cued
                       position="next"
                       data={next}
+                      className="fixed top-2/4 md:top-1/3 -right-12 md:-right-24 z-50"
                       onClick={actions.setNext}
                     />
                   </>
@@ -61,9 +63,9 @@ const AudioModal = ({
 
                   {current && (
                     <>
-                      <div className="bg-white-300 p-3 flex flex-col gap-10">
+                      <div className="bg-white-300 dark:bg-black-200 p-3 flex flex-col gap-10">
                         <div className="flex flex-col gap-4 lg:gap-6">
-                          <span className="font-semibold text-base lg:text-lg lg:text-center lg:[text-wrap:balance] text-ls-500 dark:text-ds-500">
+                          <span className="font-semibold text-base lg:text-lg lg:text-center lg:text-balance text-ls-500 dark:text-white-300">
                             {current?.title}
                           </span>
 
@@ -71,19 +73,14 @@ const AudioModal = ({
                             title={current?.title}
                             fileDuration={current?.duration}
                             publicID={current?.publicID}
-                            autoPlay={true}
                           />
                         </div>
 
                         <Link
-                          href={{
-                            pathname: "audio-message/[slug]/",
-                            query: {
-                              slug: current?.slug,
-                              q: cue ? cue : null,
-                            },
-                          }}
-                          className="group flex self-center text-neutral-100">
+                          href={`audio-message/${encodeURIComponent(
+                            current.slug
+                          )}?q=true`}
+                          className="group flex self-center text-neutral-50">
                           <span className="text-sm ">See full description</span>
                           <ArrowTopRightOnSquareIcon className="ml-2 w-4" />
                         </Link>

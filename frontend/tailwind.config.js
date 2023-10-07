@@ -8,9 +8,14 @@ module.exports = {
   theme: {
     screens: {
       xs: "375px",
-      md: "640px",
-      lg: "834px",
+      sm: "480px",
+      base: "640px",
+      umd: "768px",
+      md: "1024px",
+      lg: "1280px",
       xl: "1440px",
+      "2xl": "1728px",
+      "3xl": "1920px",
     },
     fontSize: {
       "8xl": ["3.813rem", "4.5rem"], // Desktop display
@@ -141,6 +146,13 @@ module.exports = {
       spacing: {
         7.5: "1.875rem",
         50: "12rem",
+      },
+      zIndex: {
+        60: "60",
+        70: "70",
+        80: "80",
+        90: "90",
+        100: "100",
       },
     },
   },
