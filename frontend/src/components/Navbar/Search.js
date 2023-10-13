@@ -1,11 +1,7 @@
 import { forwardRef, useRef, useEffect } from "react";
-
 import Link from "next/link";
-
 import { v4 as uuidv4 } from "uuid";
-
 import { useFuzzySearch } from "@/hooks/useFuzzySearch";
-
 import { MagnifyingGlassIcon } from "@heroicons/react/24/solid";
 
 const Search = forwardRef((props, ref) => {

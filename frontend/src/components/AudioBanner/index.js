@@ -1,10 +1,7 @@
 import { useRef } from "react";
-
 import { usePlayerContext } from "@/hooks/usePlayerContext";
 import { useModal } from "@/hooks/useModal";
-
 import AudioModal from "../AudioModal";
-
 import { truncateText } from "@/utils/truncateText";
 
 const AudioBanner = () => {

@@ -1,11 +1,8 @@
 import { useState, useEffect, useCallback } from "react";
-
 import { useRouter } from "next/router";
-
-import * as DialogPrimitive from "@radix-ui/react-dialog";
-
 import Header from "./Header";
 import Catalogue from "./Catalogue";
+import * as DialogPrimitive from "@radix-ui/react-dialog";
 
 const AudioPlaylist = () => {
   const [open, setOpen] = useState(false);

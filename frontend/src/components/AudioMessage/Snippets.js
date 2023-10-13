@@ -3,10 +3,8 @@ import { Fragment } from "react";
 import Link from "next/link";
 
 import useSWR from "swr";
-
 import Snip from "./Snip";
-import * as Skeletons from "@/components/Skeletons";
-
+import * as Skeletons from "@/components/Skeletons"
 import { v4 as uuidv4 } from "uuid";
 import { ChevronRightIcon } from "@heroicons/react/24/solid";
 

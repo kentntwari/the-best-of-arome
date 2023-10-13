@@ -1,56 +1,53 @@
-import { useRef } from "react";
-
-import { useSnapshot } from "valtio";
-
-import { store } from "@/store";
-
-import { useContextAnimationFrame } from "@/hooks/useContextAnimationFrame";
-
-import { BackwardIcon, ForwardIcon } from "@heroicons/react/24/solid";
-
-import Wrapper from "./Wrapper";
+import { useRef, useEffect, useCallback } from "react";
+import { useAudioAnimationFrame } from "@/hooks/useAudioAnimationFrame";
+import { actions as storeActions } from "@/store";
+import Audio from "./Audio";
 import TogglePlay from "./TogglePlay";
-
-import { optimizeURL } from "@/utils/optimizeURL";
+import { BackwardIcon, ForwardIcon } from "@heroicons/react/24/solid";
 import { convertToMinutesSeconds as formatTime } from "@/utils/convertToMinutesSeconds";
 
-const Board = ({ bgColor = "", title, fileDuration, publicID }) => {
-  const snap = useSnapshot(store);
+const Board = ({
+  bgColor = "",
+  fileDuration,
+  publicID,
+  global = false,
+  scoped = false,
+}) => {
+  if ((!global && !scoped) || (global && scoped))
+    throw new Error("Board must be either global or scoped");
 
   const audio_ref = useRef();
   const duration_ref = useRef();
   const currentTime_ref = useRef();
   const progressBar_ref = useRef();
 
-  useContextAnimationFrame(() => {
-    if (snap.currentAudio === publicID && currentTime_ref.current)
+  const handleUpdates = useCallback(() => {
+    if (currentTime_ref.current) {
       currentTime_ref.current.innerText =
         formatTime(audio_ref?.current?.exposeAudioCurrentTime()) ?? "00:00";
+    }
 
-    return;
-  });
-
-  useContextAnimationFrame(() => {
-    if (snap.currentAudio === publicID && progressBar_ref.current) {
+    if (progressBar_ref.current) {
       progressBar_ref.current.value =
         (audio_ref?.current?.exposeAudioCurrentTime() /
           audio_ref?.current?.exposeAudioDuration()) *
         100;
       progressBar_ref.current.style.background = `linear-gradient(to right,
-        var(--bg-progressBar-slider-track) 0 ${progressBar_ref?.current?.value}%,#dedede 0)`;
+          var(--bg-progressBar-slider-track) 0 ${progressBar_ref?.current?.value}%,#dedede 0)`;
     }
+  }, []);
 
-    return;
-  });
+  useAudioAnimationFrame(handleUpdates, { src: publicID, global, scoped });
 
   return (
     <>
       <div className={`${bgColor} flex flex-col gap-5`}>
-        <Wrapper ref={audio_ref} fallBack={optimizeURL({ publicID })} title={title}>
+        <Audio ref={audio_ref} global={global} scoped={scoped}>
           <div className="grid grid-cols-[35px_1fr_35px] items-center gap-1">
             <span ref={currentTime_ref} className="text-xs">
               00:00
             </span>
+
             <input
               ref={progressBar_ref}
               type="range"
@@ -59,12 +56,6 @@ const Board = ({ bgColor = "", title, fileDuration, publicID }) => {
               min={0}
               max={100}
               className="grow h-2 appearance-none bg-neutral-40 rounded-full"
-              onChange={(e) => {
-                audio_ref.current.currentTime =
-                  (audio_ref.current.duration * e.target.value) / 100;
-
-                return audio_ref.current.currentTime;
-              }}
             />
             <span ref={duration_ref} className="text-xs">
               {formatTime(fileDuration) ?? "--:--"}
@@ -72,17 +63,11 @@ const Board = ({ bgColor = "", title, fileDuration, publicID }) => {
           </div>
 
           <div className="flex items-center justify-center gap-4">
-            <BackwardIcon
-              onClick={() => (audio_ref.current.currentTime -= 0.5)}
-              className="w-10"
-            />
-            <TogglePlay payload={publicID} />
-            <ForwardIcon
-              onClick={() => (audio_ref.current.currentTime += 0.5)}
-              className="w-10"
-            />
+            <BackwardIcon className="w-10" />
+            <TogglePlay payload={publicID} global={global} scoped={scoped} />
+            <ForwardIcon className="w-10" />
           </div>
-        </Wrapper>
+        </Audio>
       </div>
     </>
   );

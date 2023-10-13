@@ -1,7 +1,5 @@
 import { useEffect } from "react";
-
 import { useRouter } from "next/router";
-
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 import SwitchTheme from "./SwitchTheme";
@@ -24,11 +22,8 @@ const Layout = ({ children }) => {
   return (
     <>
       <Navbar />
-
       <SwitchTheme />
-
-      <div className="grow grid">{children}</div>
-
+      <div className="xl:relative grow grid">{children}</div>
       <Footer />
     </>
   );

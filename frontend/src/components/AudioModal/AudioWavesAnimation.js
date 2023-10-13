@@ -1,7 +1,7 @@
 import { memo, useEffect, useRef } from "react";
 
 import Lottie from "lottie-react";
-import { useSnapshot } from "valtio";
+import { useSnapshot, subscribe } from "valtio";
 
 import { store } from "@/store";
 
@@ -9,14 +9,19 @@ import audioWavesAnimation from "../../../public/audio-waves.json";
 
 const MemoizedLottie = memo(Lottie);
 
-const AudioWavesAnimation = () => {
+const AudioWavesAnimation = ({ global = false, scoped = false }) => {
   const wavesAnimation_ref = useRef();
-  const snap = useSnapshot(store);
+  const snap = useSnapshot(store.isPlaying);
 
   useEffect(() => {
-    if (!snap.isPlaying) wavesAnimation_ref.current.stop();
-    if (snap.isPlaying) wavesAnimation_ref.current.play();
-  }, [snap.isPlaying]);
+    subscribe(store.isPlaying, () => {
+      if (global && store.isPlaying.global) return wavesAnimation_ref.current.stop();
+      if (scoped && store.isPlaying.scoped) return wavesAnimation_ref.current.play();
+    });
+  }, []);
+
+  if ((!global && !scoped) || (global && scoped))
+    throw new Error("AudioWavesAnimation must be either global or scoped");
 
   return (
     <div
@@ -24,11 +29,21 @@ const AudioWavesAnimation = () => {
       style={{
         background: "var(--bg-audioWaves)",
       }}>
-      <MemoizedLottie
-        lottieRef={wavesAnimation_ref}
-        animationData={audioWavesAnimation}
-        loop={snap.isPlaying ? true : false}
-      />
+      {global ? (
+        <MemoizedLottie
+          lottieRef={wavesAnimation_ref}
+          animationData={audioWavesAnimation}
+          loop={snap.global ? true : false}
+        />
+      ) : null}
+
+      {scoped ? (
+        <MemoizedLottie
+          lottieRef={wavesAnimation_ref}
+          animationData={audioWavesAnimation}
+          loop={snap.scoped ? true : false}
+        />
+      ) : null}
     </div>
   );
 };

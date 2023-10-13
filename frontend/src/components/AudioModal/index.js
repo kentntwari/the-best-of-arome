@@ -1,11 +1,8 @@
 import Link from "next/link";
-
 import { useCue } from "@/hooks/useCue";
-
 import * as AudioPlayer from "@/components/AudioPlayer";
 import * as AudioMessage from "@/components/AudioMessage";
 import AudioWavesAnimation from "./AudioWavesAnimation";
-
 import * as Dialog from "@radix-ui/react-dialog";
 import { XCircleIcon, ArrowTopRightOnSquareIcon } from "@heroicons/react/24/solid";
 
@@ -15,8 +12,10 @@ const AudioModal = ({
   fileSlug,
   cue = null,
   showCueControls = true,
+  global = false,
+  scoped = false,
 }) => {
-  const [data, actions] = useCue({
+  const [data, cueActions] = useCue({
     initID: fileID,
     initSlug: fileSlug,
     playlist: cue,
@@ -24,16 +23,19 @@ const AudioModal = ({
 
   const { prev: previous, current, next } = data;
 
+  if ((!global && !scoped) || (global && scoped))
+    throw new Error("AudioModal must be either global or scoped");
+
   return (
     <>
-      <Dialog.Root onOpenChange={actions.set}>
+      <Dialog.Root onOpenChange={cueActions.set}>
         <Dialog.Trigger asChild>{children}</Dialog.Trigger>
 
         <Dialog.Portal>
           <Dialog.Overlay className="fixed w-full h-full top-0 left-0 z-[9999] bg-[rgba(106,69,34,0.5)] dark:bg-[rgba(0,0,0,.5)]">
             <Dialog.Content
-              onPointerDownOutside={actions.reset}
-              onEscapeKeyDown={actions.reset}
+              onPointerDownOutside={cueActions.reset}
+              onEscapeKeyDown={cueActions.reset}
               className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
               <div className="relative group lg:flex lg:items-center lg:gap-10">
                 {showCueControls ? (
@@ -42,14 +44,14 @@ const AudioModal = ({
                       position="previous"
                       data={previous}
                       className="fixed top-2/4 md:top-1/3 -left-12 md:-left-24 z-50"
-                      onClick={actions.setPrevious}
+                      onClick={cueActions.setPrevious}
                     />
 
                     <AudioMessage.Cued
                       position="next"
                       data={next}
                       className="fixed top-2/4 md:top-1/3 -right-12 md:-right-24 z-50"
-                      onClick={actions.setNext}
+                      onClick={cueActions.setNext}
                     />
                   </>
                 ) : null}
@@ -59,7 +61,8 @@ const AudioModal = ({
                     <XCircleIcon />
                   </Dialog.Close>
 
-                  <AudioWavesAnimation />
+                  {global ? <AudioWavesAnimation global /> : null}
+                  {scoped ? <AudioWavesAnimation scoped /> : null}
 
                   {current && (
                     <>
@@ -69,11 +72,23 @@ const AudioModal = ({
                             {current?.title}
                           </span>
 
-                          <AudioPlayer.Board
-                            title={current?.title}
-                            fileDuration={current?.duration}
-                            publicID={current?.publicID}
-                          />
+                          {global ? (
+                            <AudioPlayer.Board
+                              title={current?.title}
+                              fileDuration={current?.duration}
+                              publicID={current?.publicID}
+                              global
+                            />
+                          ) : null}
+
+                          {scoped ? (
+                            <AudioPlayer.Board
+                              title={current?.title}
+                              fileDuration={current?.duration}
+                              publicID={current?.publicID}
+                              scoped
+                            />
+                          ) : null}
                         </div>
 
                         <Link

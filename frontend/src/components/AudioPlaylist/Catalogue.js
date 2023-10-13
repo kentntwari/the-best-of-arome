@@ -40,7 +40,8 @@ const Catalogue = () => {
                 <AudioModal
                   fileID={details.id}
                   fileSlug={details.slug}
-                  cue={router.query.playlist}>
+                  cue={router.query.playlist}
+                  scoped>
                   <div
                     className={`px-2 py-4 flex items-center justify-between cursor-pointer`}>
                     <p className="grow truncate font-semibold text-xs text-ls-400 dark:text-white-300">

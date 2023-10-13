@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback } from "react";
-
 import { MoonIcon, SunIcon } from "@heroicons/react/24/solid";
 
 const SwitchTheme = () => {
