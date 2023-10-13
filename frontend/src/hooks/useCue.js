@@ -1,5 +1,4 @@
 import { useState, useCallback } from "react";
-
 import useSWR from "swr";
 
 const useCue = ({ initID, initSlug, playlist = null }) => {

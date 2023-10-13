@@ -1,7 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-
 import useSWR from "swr";
-
 import debounce from "lodash.debounce";
 
 const useFuzzySearch = () => {
