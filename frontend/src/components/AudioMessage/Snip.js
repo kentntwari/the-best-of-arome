@@ -1,6 +1,30 @@
 import Link from "next/link";
-import * as AudioPlayer from "@/components/AudioPlayer";
+import { useSnapshot } from "valtio";
+import { store, actions as storeActions } from "@/store";
+import { PlayCircleIcon, PauseCircleIcon } from "@heroicons/react/24/solid";
 import { convertToMinutesSeconds as formatTime } from "@/utils/convertToMinutesSeconds";
+
+const Player = ({ currentAudioID }) => {
+  const snap = useSnapshot(store.global);
+
+  return (
+    <>
+      <button type="button">
+        {snap.isPlaying && snap.currentAudioID === currentAudioID ? (
+          <PauseCircleIcon
+            className="w-10 text-ls-300 dark:text-white-300"
+            onClick={() => storeActions.pauseAudio("GLOBAL")}
+          />
+        ) : (
+          <PlayCircleIcon
+            className="w-10 text-ls-400 dark:text-white-300"
+            onClick={() => storeActions.playAudio("GLOBAL", currentAudioID)}
+          />
+        )}
+      </button>
+    </>
+  );
+};
 
 const Snip = (props) => {
   return (
@@ -23,7 +47,7 @@ const Snip = (props) => {
             <span className="text-xs md:text-sm text-ls-400 dark:text-white-300">
               {formatTime(props.duration)}
             </span>
-            <AudioPlayer.TogglePlay payload={props.publicID} global />
+            <Player currentAudioID={props.publicID} />
           </div>
         </div>
       </div>
