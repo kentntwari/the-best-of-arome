@@ -1,40 +1,51 @@
+import { useCallback } from "react";
 import { useSnapshot } from "valtio";
-import { store as _, actions as storeActions } from "@/store";
+import { store, actions as storeActions } from "@/store";
 import { PauseCircleIcon, PlayCircleIcon } from "@heroicons/react/24/solid";
 
 // payload in this case is the publicID of the audio source
 const TogglePlay = ({ payload, global = false, scoped = false }) => {
-  const snap = useSnapshot(_);
+  const snap = useSnapshot(store);
+
+  const pauseAudio = useCallback(() => {
+    if (global) return storeActions.pauseAudio("GLOBAL");
+    if (scoped) return storeActions.pauseAudio("SCOPED");
+  }, [global, scoped]);
+
+  const playAudio = useCallback(() => {
+    if (global) return storeActions.playAudio("GLOBAL", payload);
+    if (scoped) return storeActions.playAudio("SCOPED", payload);
+  }, [global, scoped]);
 
   if ((!global && !scoped) || (global && scoped))
-    throw new Error("TogglePlay must be either global or scoped");
+    throw new Error("TogglePlay must be either GLOBAL or SCOPED");
 
   return (
     <>
       <button type="button">
         {global ? (
-          snap.currentAudio.global === payload && snap.isPlaying.global ? (
+          snap.global.currentAudioID === payload && snap.global.isPlaying ? (
             <PauseCircleIcon
-              onClick={storeActions.pauseGlobal}
+              onClick={pauseAudio}
               className="w-10 text-ls-300 dark:text-white-300"
             />
           ) : (
             <PlayCircleIcon
-              onClick={() => storeActions.playGlobal(payload)}
+              onClick={playAudio}
               className="w-10 text-ls-400 dark:text-white-300"
             />
           )
         ) : null}
 
         {scoped ? (
-          snap.currentAudio.scoped === payload && snap.isPlaying.scoped ? (
+          snap.scoped.currentAudioID === payload && snap.scoped.isPlaying ? (
             <PauseCircleIcon
-              onClick={storeActions.pauseScoped}
+              onClick={pauseAudio}
               className="w-10 text-ls-300 dark:text-white-300"
             />
           ) : (
             <PlayCircleIcon
-              onClick={() => storeActions.playScoped(payload)}
+              onClick={playAudio}
               className="w-10 text-ls-400 dark:text-white-300"
             />
           )

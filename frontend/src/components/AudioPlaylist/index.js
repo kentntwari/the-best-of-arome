@@ -12,7 +12,7 @@ const AudioPlaylist = () => {
   const goBack = useCallback(
     () =>
       router.push(
-        `/${router.query.slug ? `/audio-message/${router.query.slug}` : "/browse"}`
+        `/${router.query.slug ? `audio-message/${router.query.slug}` : "browse"}`
       ),
     [router.query]
   );

@@ -32,7 +32,7 @@ const Search = forwardRef((props, ref) => {
   return (
     <div
       ref={ref}
-      className={`lg:block lg:w-[412px] fixed lg:static left-0 top-20 z-10 px-5 w-full`}>
+      className={`hidden lg:block lg:w-[412px] fixed lg:static left-0 top-20 z-10 px-5 w-full`}>
       <search>
         <form
           id="search_form"
