@@ -11,12 +11,12 @@ const MemoizedLottie = memo(Lottie);
 
 const AudioWavesAnimation = ({ global = false, scoped = false }) => {
   const wavesAnimation_ref = useRef();
-  const snap = useSnapshot(store.isPlaying);
+  const snap = useSnapshot(store);
 
   useEffect(() => {
-    subscribe(store.isPlaying, () => {
-      if (global && store.isPlaying.global) return wavesAnimation_ref.current.stop();
-      if (scoped && store.isPlaying.scoped) return wavesAnimation_ref.current.play();
+    subscribe(store, () => {
+      if (global && store.global.isPlaying) return wavesAnimation_ref.current.stop();
+      if (scoped && store.scoped.isPlaying) return wavesAnimation_ref.current.play();
     });
   }, []);
 
@@ -33,7 +33,7 @@ const AudioWavesAnimation = ({ global = false, scoped = false }) => {
         <MemoizedLottie
           lottieRef={wavesAnimation_ref}
           animationData={audioWavesAnimation}
-          loop={snap.global ? true : false}
+          loop={snap.global.isPlaying ? true : false}
         />
       ) : null}
 
@@ -41,7 +41,7 @@ const AudioWavesAnimation = ({ global = false, scoped = false }) => {
         <MemoizedLottie
           lottieRef={wavesAnimation_ref}
           animationData={audioWavesAnimation}
-          loop={snap.scoped ? true : false}
+          loop={snap.scoped.isPlaying ? true : false}
         />
       ) : null}
     </div>
