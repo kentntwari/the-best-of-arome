@@ -1,10 +1,7 @@
 import Script from "next/script";
-
 import { SWRConfig } from "swr";
 import { NextSeo } from "next-seo";
-
 import Layout from "@/components/Layout";
-
 import "../styles/globals.css";
 
 export default function App({ Component, pageProps }) {

@@ -1,7 +1,5 @@
 import { Fragment } from "react";
-
 import Link from "next/link";
-
 import useSWR from "swr";
 
 import { v4 as uuidv4 } from "uuid";

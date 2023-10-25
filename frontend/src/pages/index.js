@@ -1,23 +1,17 @@
 import { Fragment, useState, useRef } from "react";
-
 import Link from "next/link";
-import Head from "next/head";
-
 import useSWR from "swr";
-
 import { v4 as uuidv4 } from "uuid";
 import { NextSeo } from "next-seo";
-
 import { CldImage } from "next-cloudinary";
 import * as Dialog from "@radix-ui/react-dialog";
+import * as Skeletons from "@/components/Skeletons";
+import * as AudioMessage from "@/components/AudioMessage";
 import {
   ArrowRightIcon,
   XCircleIcon,
   ChevronDoubleDownIcon,
 } from "@heroicons/react/24/solid";
-
-import * as Skeletons from "@/components/Skeletons";
-import * as AudioMessage from "@/components/AudioMessage";
 
 const defineCoverImagesClasses = {
   centerImage:
@@ -32,15 +26,15 @@ const GridImagesWrapper = ({ children, orderCondition }) => {
   return (
     <div
       className={`relative overflow-hidden w-full ${
-        orderCondition === "Apostle Arome at a major crusade in South Africa"
+        orderCondition === "Apostle Arome Osayi at a major crusade in South Africa"
           ? defineCoverImagesClasses.centerImage
           : ""
       }${
-        orderCondition === "Apostle Arome at a major crusade in Uganda"
+        orderCondition === "Apostle Arome Osayi at a major crusade in Uganda"
           ? defineCoverImagesClasses.leftImage
           : ""
       }${
-        orderCondition === "Apostle Arome at an apostolic conference in Ghana"
+        orderCondition === "Apostle Arome Osayi at an apostolic conference in Ghana"
           ? defineCoverImagesClasses.rightImage
           : ""
       }`}>

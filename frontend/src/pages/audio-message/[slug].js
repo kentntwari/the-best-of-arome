@@ -1,13 +1,11 @@
-import { useRef } from "react";
-
+import { useRef, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
-
 import useSWR from "swr";
-
 import { NextSeo } from "next-seo";
+import { useCue } from "@/hooks/useCue";
+import { actions as storeActions } from "@/store";
 import { ChevronRightIcon, ChevronLeftIcon } from "@heroicons/react/24/solid";
-
 import * as AudioMessage from "@/components/AudioMessage";
 import * as AudioPlayer from "@/components/AudioPlayer";
 import AudioPlaylist from "@/components/AudioPlaylist";
@@ -27,49 +25,91 @@ const AudioMessagePage = ({ data: res }) => {
 
   const description_ref = useRef();
 
-  const { data } = useSWR(() =>
-    router.query.q
-      ? `http://localhost:1337/api/cue/${id}?playlist=${playlistSlug}`
-      : `http://localhost:1337/api/cue/${id}`
+  const [cueData, cueActions] = useCue({
+    initID: id,
+    initSlug: audioSlug,
+    playlist: router.query.q ? playlistSlug : null,
+  });
+
+  const { data: previousMessage } = useSWR(() =>
+    cueData?.prev?.slug
+      ? `http://localhost:1337/api/audio-messages?q=${cueData?.prev?.slug}`
+      : null
   );
+
+  const { data: nextMessage } = useSWR(() =>
+    cueData?.next?.slug
+      ? `http://localhost:1337/api/audio-messages?q=${cueData?.next?.slug}`
+      : null
+  );
+
+  useEffect(() => {
+    let mounted = true;
+
+    if (mounted) cueActions.set();
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   return (
     <>
       <NextSeo title={title} description={description} />
 
-      {data?.at(0)?.prev ? (
+      {cueData?.prev ? (
         <AudioMessage.Cued
           position="previous"
-          data={data?.at(0)?.prev}
-          className="fixed top-1/2 -left-12 lg:left-0">
-          <Link
-            href={
+          data={cueData?.prev}
+          className="fixed top-1/2 -left-12 lg:left-0"
+          onClick={() => {
+            cueActions.setPrevious();
+
+            // audio will always be global
+            storeActions.loadPreviousAudio(
+              "GLOBAL",
+              previousMessage?.at(0)?.publicID,
+              previousMessage?.at(0)?.title
+            );
+
+            // modify URL
+            return router.push(
               router.query.q
                 ? `/audio-message/${encodeURIComponent(
-                    data?.at(0)?.prev?.slug
+                    cueData?.prev?.slug
                   )}?q=${encodeURIComponent(playlistSlug)}`
-                : `/audio-message/${encodeURIComponent(data?.at(0)?.prev?.slug)}`
-            }
-            className="relative">
-            <ChevronLeftIcon className="w-10 translate-x-2 lg:translate-x-0" />
-          </Link>
+                : `/audio-message/${encodeURIComponent(cueData?.prev?.slug)}`
+            );
+          }}>
+          <ChevronLeftIcon className="w-10 translate-x-2 lg:translate-x-0" />
         </AudioMessage.Cued>
       ) : null}
 
-      {data?.at(0)?.next ? (
+      {cueData?.next ? (
         <AudioMessage.Cued
           position="next"
-          data={data?.at(0)?.next}
-          className="fixed top-1/2 -right-12 lg:right-0">
-          <Link
-            href={
+          data={cueData?.next}
+          className="fixed top-1/2 -right-12 lg:right-0"
+          onClick={() => {
+            cueActions.setNext();
+
+            // audio will always be global
+            storeActions.loadNextAudio(
+              "GLOBAL",
+              nextMessage?.at(0)?.publicID,
+              nextMessage?.at(0)?.title
+            );
+
+            // modify URL
+            return router.push(
               router.query.q
-                ? `/audio-message/${data?.at(0)?.next?.slug}?q=${playlistSlug}`
-                : `/audio-message/${data?.at(0)?.next?.slug}`
-            }
-            className="relative">
-            <ChevronRightIcon className="w-10 -translate-x-2 lg:translate-x-0" />
-          </Link>
+                ? `/audio-message/${encodeURIComponent(
+                    cueData?.next?.slug
+                  )}?q=${encodeURIComponent(playlistSlug)}`
+                : `/audio-message/${encodeURIComponent(cueData?.next?.slug)}`
+            );
+          }}>
+          <ChevronRightIcon className="w-10 -translate-x-2 lg:translate-x-0" />
         </AudioMessage.Cued>
       ) : null}
 
@@ -102,6 +142,7 @@ const AudioMessagePage = ({ data: res }) => {
               publicID={publicID}
               title={title}
               fileDuration={duration}
+              global
             />
           </div>
         </section>
