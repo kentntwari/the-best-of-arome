@@ -17,7 +17,7 @@ const AudioMessagePage = ({ data: res }) => {
     description,
     slug: audioSlug,
     duration,
-    playlist: { slug: playlistSlug },
+    playlist,
     publicID,
   } = res[0];
 
@@ -28,7 +28,7 @@ const AudioMessagePage = ({ data: res }) => {
   const [cueData, cueActions] = useCue({
     initID: id,
     initSlug: audioSlug,
-    playlist: router.query.q ? playlistSlug : null,
+    playlist: router.query.q ? playlist?.slug : null,
   });
 
   const { data: previousMessage } = useSWR(() =>
@@ -77,7 +77,7 @@ const AudioMessagePage = ({ data: res }) => {
               router.query.q
                 ? `/audio-message/${encodeURIComponent(
                     cueData?.prev?.slug
-                  )}?q=${encodeURIComponent(playlistSlug)}`
+                  )}?q=${encodeURIComponent(playlist?.slug)}`
                 : `/audio-message/${encodeURIComponent(cueData?.prev?.slug)}`
             );
           }}>
@@ -105,7 +105,7 @@ const AudioMessagePage = ({ data: res }) => {
               router.query.q
                 ? `/audio-message/${encodeURIComponent(
                     cueData?.next?.slug
-                  )}?q=${encodeURIComponent(playlistSlug)}`
+                  )}?q=${encodeURIComponent(playlist?.slug)}`
                 : `/audio-message/${encodeURIComponent(cueData?.next?.slug)}`
             );
           }}>
@@ -120,7 +120,7 @@ const AudioMessagePage = ({ data: res }) => {
           role="message">
           <div className="px-5 py-4 md:p-0 flex items-center gap-2 text-black-300 dark:text-white-300">
             <Link
-              href={`/audio-message/${audioSlug}/?playlist=${playlistSlug}`}
+              href={`/audio-message/${audioSlug}/?playlist=${playlist?.slug}`}
               className="text-xs">
               Go back to playlist
             </Link>
@@ -183,7 +183,9 @@ export async function getStaticPaths() {
 }
 
 export async function getStaticProps({ params }) {
-  const res = await fetch(`https://the-best-of-arome.onrender.com/api/audio-messages?q=${params.slug}`);
+  const res = await fetch(
+    `https://the-best-of-arome.onrender.com/api/audio-messages?q=${params.slug}`
+  );
 
   const data = await res.json();
 
