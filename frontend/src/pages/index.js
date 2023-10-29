@@ -47,7 +47,9 @@ export default function Home() {
   //when image resolves to an error
   const [showSkeleton, setShowSkeleton] = useState(false);
 
-  const { data } = useSWR("http://localhost:1337/api/homepage");
+  const { data } = useSWR(
+    `${process.env.NEXT_PUBLIC_EXTERNAL_RESSOURCES_URL}/api/homepage`
+  );
 
   const homepageScreen_ref = useRef();
   const snippets_ref = useRef();
