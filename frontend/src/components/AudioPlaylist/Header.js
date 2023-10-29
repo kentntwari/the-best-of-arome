@@ -6,7 +6,9 @@ import * as Shapes from "@/components/Skeletons/ShapeSkeleton";
 const Header = () => {
   const router = useRouter();
 
-  const { data: playlists } = useSWR("http://localhost:1337/api/playlists");
+  const { data: playlists } = useSWR(
+    `${process.env.NEXT_PUBLIC_EXTERNAL_RESSOURCES_URL}/api/playlists`
+  );
 
   return (
     <>

@@ -27,13 +27,13 @@ const AudioModal = ({
 
   const { data: previousMessage } = useSWR(() =>
     cueData?.prev?.slug
-      ? `http://localhost:1337/api/audio-messages?q=${cueData?.prev?.slug}`
+      ? `${process.env.NEXT_PUBLIC_EXTERNAL_RESSOURCES_URL}/api/audio-messages?q=${cueData?.prev?.slug}`
       : null
   );
 
   const { data: nextMessage } = useSWR(() =>
     cueData?.next?.slug
-      ? `http://localhost:1337/api/audio-messages?q=${cueData?.next?.slug}`
+      ? `${process.env.NEXT_PUBLIC_EXTERNAL_RESSOURCES_URL}/api/audio-messages?q=${cueData?.next?.slug}`
       : null
   );
 

@@ -9,7 +9,7 @@ import { v4 as uuidv4 } from "uuid";
 import { ChevronRightIcon } from "@heroicons/react/24/solid";
 
 const Snippets = () => {
-  const { data: snippets } = useSWR("http://localhost:1337/api/snippets");
+  const { data: snippets } = useSWR(`${process.env.NEXT_PUBLIC_EXTERNAL_RESSOURCES_URL}/api/snippets`);
 
   return (
     <div
