@@ -5,7 +5,11 @@ import debounce from "lodash.debounce";
 const useFuzzySearch = () => {
   const [query, setQuery] = useState(null);
 
-  const { data } = useSWR(query ? `http://localhost:1337/api/search?q=${query}` : null);
+  const { data } = useSWR(
+    query
+      ? `${process.env.NEXT_PUBLIC_EXTERNAL_RESSOURCES_URL}/api/search?q=${query}`
+      : null
+  );
 
   const setDebouncedQuery = useMemo(
     () => debounce((element) => setQuery(element?.target?.value ?? element), 500),
