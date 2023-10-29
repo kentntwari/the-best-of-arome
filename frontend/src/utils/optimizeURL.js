@@ -20,7 +20,7 @@ export function optimizeURL({
   if (!transformations)
     return cld
       .video(publicID)
-      .transcode(bitRate("64k"))
+      .transcode(bitRate("32k"))
       .videoEdit(volume(70))
       .format("auto")
       .toURL();
