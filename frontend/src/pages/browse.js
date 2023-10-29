@@ -10,10 +10,10 @@ import { ArrowRightIcon } from "@heroicons/react/24/solid";
 import AudioPlaylist from "@/components/AudioPlaylist";
 
 const Browse = () => {
-  const { data: playlists } = useSWR(`${process.env.NEXT_PUBLIC_EXTERNAL_RESSOURCES_URL}/api/playlists`);
+  const { data: playlists } = useSWR(`https://the-best-of-arome.onrender.com/api/playlists`);
 
   const { data: browseDetails } = useSWR(
-    `${process.env.NEXT_PUBLIC_EXTERNAL_RESSOURCES_URL}/api/browsepage?populate=*`
+    `https://the-best-of-arome.onrender.com/api/browsepage?populate=*`
   );
 
   if (!playlists || playlists?.length === 0) return;

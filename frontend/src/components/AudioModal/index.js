@@ -27,13 +27,13 @@ const AudioModal = ({
 
   const { data: previousMessage } = useSWR(() =>
     cueData?.prev?.slug
-      ? `${process.env.NEXT_PUBLIC_EXTERNAL_RESSOURCES_URL}/api/audio-messages?q=${cueData?.prev?.slug}`
+      ? `https://the-best-of-arome.onrender.com/api/audio-messages?q=${cueData?.prev?.slug}`
       : null
   );
 
   const { data: nextMessage } = useSWR(() =>
     cueData?.next?.slug
-      ? `${process.env.NEXT_PUBLIC_EXTERNAL_RESSOURCES_URL}/api/audio-messages?q=${cueData?.next?.slug}`
+      ? `https://the-best-of-arome.onrender.com/api/audio-messages?q=${cueData?.next?.slug}`
       : null
   );
 
