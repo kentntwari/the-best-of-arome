@@ -6,7 +6,7 @@ const useFuzzySearch = () => {
   const [query, setQuery] = useState(null);
 
   const { data } = useSWR(
-    query ? `https://the-best-of-arome.onrender.com/api/search?q=${query}` : null
+    query ? `${process.env.NEXT_PUBLIC_RESSOURCES_URL}/api/search?q=${query}` : null
   );
 
   const setDebouncedQuery = useMemo(

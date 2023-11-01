@@ -33,13 +33,13 @@ const AudioMessagePage = ({ data: res }) => {
 
   const { data: previousMessage } = useSWR(() =>
     cueData?.prev?.slug
-      ? `https://the-best-of-arome.onrender.com/api/audio-messages?q=${cueData?.prev?.slug}`
+      ? `${process.env.NEXT_PUBLIC_RESSOURCES_URL}/api/audio-messages?q=${cueData?.prev?.slug}`
       : null
   );
 
   const { data: nextMessage } = useSWR(() =>
     cueData?.next?.slug
-      ? `https://the-best-of-arome.onrender.com/api/audio-messages?q=${cueData?.next?.slug}`
+      ? `${process.env.NEXT_PUBLIC_RESSOURCES_URL}/api/audio-messages?q=${cueData?.next?.slug}`
       : null
   );
 
@@ -166,7 +166,7 @@ const AudioMessagePage = ({ data: res }) => {
 };
 
 export async function getStaticPaths() {
-  const res = await fetch(`https://the-best-of-arome.onrender.com/api/audio-messages`);
+  const res = await fetch(`${process.env.NEXT_PUBLIC_RESSOURCES_URL}/api/audio-messages`);
 
   const data = await res.json();
 
@@ -184,7 +184,7 @@ export async function getStaticPaths() {
 
 export async function getStaticProps({ params }) {
   const res = await fetch(
-    `https://the-best-of-arome.onrender.com/api/audio-messages?q=${params.slug}`
+    `${process.env.NEXT_PUBLIC_RESSOURCES_URL}/api/audio-messages?q=${params.slug}`
   );
 
   const data = await res.json();
