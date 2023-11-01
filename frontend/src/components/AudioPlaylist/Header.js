@@ -7,7 +7,7 @@ const Header = () => {
   const router = useRouter();
 
   const { data: playlists } = useSWR(
-    `https://the-best-of-arome.onrender.com/api/playlists`
+    `${process.env.NEXT_PUBLIC_RESSOURCES_URL}/api/playlists`
   );
 
   return (

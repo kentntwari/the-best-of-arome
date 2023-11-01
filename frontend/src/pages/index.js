@@ -47,7 +47,7 @@ export default function Home() {
   //when image resolves to an error
   const [showSkeleton, setShowSkeleton] = useState(false);
 
-  const { data } = useSWR(`https://the-best-of-arome.onrender.com/api/homepage`);
+  const { data } = useSWR(`${process.env.NEXT_PUBLIC_RESSOURCES_URL}/api/homepage`);
 
   const homepageScreen_ref = useRef();
   const snippets_ref = useRef();

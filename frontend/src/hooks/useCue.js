@@ -9,16 +9,16 @@ const useCue = ({ initID, initSlug, playlist = null }) => {
 
   const { data: cued } = useSWR(() => {
     if ((options.id && !playlist) || (options.id && playlist === ""))
-      return `https://the-best-of-arome.onrender.com/api/cue/${options.id}`;
+      return `${process.env.NEXT_PUBLIC_RESSOURCES_URL}/api/cue/${options.id}`;
 
     if (options.id && playlist)
-      return `https://the-best-of-arome.onrender.com/api/cue/${options.id}?playlist=${playlist}`;
+      return `${process.env.NEXT_PUBLIC_RESSOURCES_URL}/api/cue/${options.id}?playlist=${playlist}`;
 
     return null;
   });
 
   const { data: current } = useSWR(() =>
-    options.slug ? `https://the-best-of-arome.onrender.com/api/audio-messages?q=${options.slug}` : null
+    options.slug ? `${process.env.NEXT_PUBLIC_RESSOURCES_URL}/api/audio-messages?q=${options.slug}` : null
   );
 
   const set = useCallback(() =>
