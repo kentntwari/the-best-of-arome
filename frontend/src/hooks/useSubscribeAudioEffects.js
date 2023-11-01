@@ -7,11 +7,47 @@ const useSubscribeAudioEffects = (currentAudio, { global = false, scoped = false
     subscribe(store, () => {
       // Set a facade to reactively play the audio within react compoent tree albeit muted
       // in order to take advantage ffo react lifecycle
-      if (global && store.global.isPlaying) currentAudio?.current?.play();
-      if (global && !store.global.isPlaying) currentAudio?.current?.pause();
+      if (global && store.global.isPlaying) {
+        // Show loading animation.
+        const playPromise = currentAudio?.current?.play();
 
-      if (scoped && store.scoped.isPlaying) currentAudio?.current?.play();
-      if (scoped && !store.scoped.isPlaying) currentAudio?.current?.pause();
+        if (playPromise !== undefined) {
+          playPromise
+            .then((_) => {
+              // Automatic playback started!
+              // Show playing UI.
+              // We can now safely pause video...
+              if (global && !store.global.isPlaying) currentAudio?.current?.pause();
+            })
+            .catch((error) => {
+              // Auto-play was prevented
+              // Show paused UI.
+              console.error(error);
+              store.global.isPlaying = false;
+            });
+        }
+      }
+
+      if (scoped && store.scoped.isPlaying) {
+        // Show loading animation.
+        const playPromise = currentAudio?.current?.play();
+
+        if (playPromise !== undefined) {
+          playPromise
+            .then((_) => {
+              // Automatic playback started!
+              // Show playing UI.
+              // We can now safely pause video...
+              if (scoped && !store.scoped.isPlaying) currentAudio?.current?.pause();
+            })
+            .catch((error) => {
+              // Auto-play was prevented
+              // Show paused UI.
+              console.error(error);
+              store.scoped.isPlaying = false;
+            });
+        }
+      }
 
       if (global && store.global.isForwarded) {
         switch (currentAudio?.current?.currentTime) {
