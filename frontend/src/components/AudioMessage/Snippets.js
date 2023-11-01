@@ -4,13 +4,13 @@ import Link from "next/link";
 
 import useSWR from "swr";
 import Snip from "./Snip";
-import * as Skeletons from "@/components/Skeletons"
+import * as Skeletons from "@/components/Skeletons";
 import { v4 as uuidv4 } from "uuid";
 import { ChevronRightIcon } from "@heroicons/react/24/solid";
 
 const Snippets = () => {
   const { data: snippets } = useSWR(
-    `https://the-best-of-arome.onrender.com/api/snippets`
+    `${process.env.NEXT_PUBLIC_RESSOURCES_URL}/api/snippets`
   );
 
   return (

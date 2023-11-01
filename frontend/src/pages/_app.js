@@ -2,6 +2,7 @@ import Script from "next/script";
 import { SWRConfig } from "swr";
 import { NextSeo } from "next-seo";
 import Layout from "@/components/Layout";
+import { poppins } from "@/styles/fonts";
 import "../styles/globals.css";
 
 export default function App({ Component, pageProps }) {
@@ -31,7 +32,7 @@ export default function App({ Component, pageProps }) {
         },
       }}>
       <div
-        className={`min-h-screen min-w-[335px] xl:max-w-7xl mx-auto overflow-auto flex flex-col  font-sans font-normal`}>
+        className={`min-h-screen min-w-[335px] xl:max-w-7xl mx-auto overflow-auto flex flex-col ${poppins.variable} font-sans font-normal`}>
         <Layout>
           <NextSeo
             description="Listen to compilations of Apostle Arome Osayi most inspirational audio messages excerpts"
