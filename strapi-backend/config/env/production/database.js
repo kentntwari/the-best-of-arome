@@ -1,5 +1,5 @@
 const parse = require("pg-connection-string").parse;
-const config = parse(process.env.DATABASE_URL);
+const config = parse(process.env.PRODUCTION_DATABASE_URL);
 
 module.exports = ({ env }) => ({
   connection: {
@@ -15,5 +15,9 @@ module.exports = ({ env }) => ({
       },
     },
     debug: false,
+  },
+  pool: {
+    min: 2,
+    max: 10,
   },
 });
