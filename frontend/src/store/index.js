@@ -214,7 +214,25 @@ subscribe(store.global, () => {
       audio.currentTime = 0;
     });
 
-    if (isPlaying) audio.play();
-    if (!isPlaying) audio.pause();
+    if (isPlaying) {
+      // Show loading animation.
+      const playPromise = audio.play();
+
+      if (playPromise !== undefined) {
+        playPromise
+          .then((_) => {
+            // Automatic playback started!
+            // Show playing UI.
+            // We can now safely pause video...
+            if (!isPlaying) audio.pause();
+          })
+          .catch((error) => {
+            // Auto-play was prevented
+            // Show paused UI.
+            console.error(error);
+            actions.pauseAudio("GLOBAL");
+          });
+      }
+    }
   }
 });
